@@ -1,37 +1,24 @@
 # 复习管理平台
 
-#### 介绍
-本项目的主要功能是帮助用户进行更加高效科学的复习。通过结合艾宾浩斯遗忘曲线以及deepseek进行出题判题，设计出了针对用户文档片段级别的掌握度管理。
+##  基本介绍
 
-#### 软件架构
-软件架构说明
+Review Manager 是一个基于 Vue3 和 SpringCloud 的文档复习平台。通过设计符合艾宾浩斯遗忘曲线的遗忘机制，给用户展现直观清晰的文档掌握度记录。并利用deepseek进行针对性出题和做题评价，实现用户自定义的针对复习的计划。
 
+![主要功能界面](README.assets/主要功能界面.png)
 
-#### 安装教程
+~~[开发文档]()~~ | [在线演示](https://wainyz.online/review/) | [码云(国内镜像)](https://gitee.com/umodoc/editor) 
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+##  在线体验
 
-#### 使用说明
+访问[https://wainyz.online/review](https://wainyz.online/review)快速体验。
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+## 开发文档
 
-#### 参与贡献
+请访问[https://www.showdoc.com.cn/***REMOVED***](https://www.showdoc.com.cn/***REMOVED***)。
 
-1.  Fork 本仓库
-2.  新建 Feat_xxx 分支
-3.  提交代码
-4.  新建 Pull Request
+##  设计理念
 
 
-#### 特技
 
-1.  使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
-2.  Gitee 官方博客 [blog.gitee.com](https://blog.gitee.com)
-3.  你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解 Gitee 上的优秀开源项目
-4.  [GVP](https://gitee.com/gvp) 全称是 Gitee 最有价值开源项目，是综合评定出的优秀开源项目
-5.  Gitee 官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
-6.  Gitee 封面人物是一档用来展示 Gitee 会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
+## 安装教程
+
