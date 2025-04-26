@@ -1,0 +1,6 @@
+{
+"coverage": 0,
+"allMastery": 0,
+"currentMastery":0,
+"masteryRecords": []
+}

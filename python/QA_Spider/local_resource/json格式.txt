@@ -1,0 +1,22 @@
+[
+  {
+    "id": "Q001",
+    "type": "single_choice",
+    "question": "中国首都是？",
+    "options": ["上海", "广州", "北京", "深圳"],
+    "answer": 2,
+    "metadata": {
+      "difficulty": 0.8,
+      "tags": ["地理", "首都"],
+      "image": "beijing.jpg"
+    }
+  },
+  {
+    "id": "Q002",
+    "type": "multi_choice",
+    "question": "属于编程语言的是？",
+    "options": ["Python", "HTML", "Java", "CSS"],
+    "answer": [0,2],
+    "explanation": "HTML/CSS是标记语言"
+  }
+]

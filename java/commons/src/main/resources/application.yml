@@ -1,0 +1,7 @@
+spring:
+ application:
+    name: commons
+ profiles:
+    active: dev
+server:
+    port: 8001

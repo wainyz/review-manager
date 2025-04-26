@@ -1,0 +1,52 @@
+jwt:
+  secret: eccb33208298cea51c29db8f926b9146213eccb33208298cea51c29db8f926b9146123eccb33208298cea51c29db8f926b9146123eccb33208298cea51c29db8f926b9146123eccb33208298cea51c29db8f926b9146123eccb33208298cea51c29db8f926b9146
+  expiration: 3600
+spring:
+  # 邮件配置
+  mail:
+    host: smtp.163.com
+    port: 465
+    username: ***REMOVED***
+    password: ***REMOVED***  # 网易邮箱的授权码，非登录密码
+    protocol: smtps
+    properties:
+      mail:
+        smtp:
+          ssl:
+            enable: true
+          auth: true
+  # redis配置
+  data:
+    redis:
+      port: 6379
+      host: ***REMOVED***
+      database: 0
+      password: ***REMOVED***
+      username: ***REMOVED***
+  datasource:
+    url: jdbc:mysql://***REMOVED***:3306/spring_cloud
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: service
+    password: ***REMOVED***
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+    listener:
+      simple:
+        prefetch: 10 # 每个消费者最大预取消息数
+        concurrency: 3 # 最小消费者数量
+        max-concurrency: 5 # 最大消费者数量
+        acknowledge-mode: manual # 手动确认模式
+
+
+
+# 保存user file的base path
+file:
+  data-file-base-path: ./user/file/
+  controller-file-base-path: ./user/history/
+  deepseek-response: ./user/deepseek/response/
+# deepseek的 api key
+deepseek:
+  api-key: ***REMOVED***
