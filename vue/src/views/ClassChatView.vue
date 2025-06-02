@@ -568,7 +568,7 @@ const submitEdit = async () => {
   if (!editFormRef.value) return
   
   try {
-    await editFormRef.value.validate()
+    // await editFormRef.value.validate()
     
     submitting.value = true
     
