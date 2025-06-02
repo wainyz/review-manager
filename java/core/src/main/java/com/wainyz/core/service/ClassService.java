@@ -12,7 +12,7 @@ public interface ClassService extends IService<Class> {
     void addClass(Long userId, Long classId);
     void updateClass(Class newClass);
     boolean mySave(Class entity);
-    void applyAddClass(Long userId, Long classId, String description) throws Exception;
+    void applyAddClass(Long userId, Long classId, String description, String username, String className) throws Exception;
     void rebackApply(Long userId, Long noticeId, int reback) throws Exception;
     void kickOutUser(Long operationUserId, Long classId, Long outUserId) throws Exception;
     boolean isInClass(Long userId, Long classId);

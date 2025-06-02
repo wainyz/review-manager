@@ -85,11 +85,13 @@ public class ClassController {
     @PostMapping("/apply/add")
     public ReturnModel applyAddClass(@RequestAttribute(GatewayConsistent.USER_ID) Long userId,
                                    @RequestParam("classId") Long classId,
+                                     @RequestAttribute(GatewayConsistent.USER_NAME) String username,
                                      @RequestParam("description") String description){
         try {
-            classService.applyAddClass(userId, classId, description);
+            classService.applyAddClass(userId, classId, description, username, classService.getById(classId).getClassName());
             return ReturnModel.success();
         }catch (Exception e){
+            e.printStackTrace();
             return ReturnModel.fail().setMessage(e.getMessage());
         }
     }
@@ -212,29 +214,31 @@ public class ClassController {
 
          Notice applyNotice = noticeService.getById(noticeId);
          Map<String, String> params = NoticeTypeEnum.ADD_CLASS_APPLY.parser(applyNotice.getContent());
+         String className = params.get(NoticeTypeEnum.ADD_CLASS_APPLY.otherInfo[4]);
          Notice notice = new Notice();
          if(!classService.getById(Long.valueOf(params.get(NoticeTypeEnum.ADD_CLASS_APPLY.otherInfo[1]))).getOwner().equals(userId)){
              return ReturnModel.fail().setMessage("权限不足");
          }
          notice.setTypeByEnum(NoticeTypeEnum.REJECT_CLASS_APPLY);
-         notice.setUserid(Long.valueOf(params.get(NoticeTypeEnum.ADD_CLASS_APPLY.otherInfo[0])));
+         notice.setUserid(params.get(NoticeTypeEnum.ADD_CLASS_APPLY.otherInfo[0]));
          notice.setTimestamp(new Date());
-         notice.setContent(NoticeTypeEnum.REJECT_CLASS_APPLY.stringify(params.get(NoticeTypeEnum.ADD_CLASS_APPLY.otherInfo[1])));
+         notice.setContent(NoticeTypeEnum.REJECT_CLASS_APPLY.stringify(params.get(NoticeTypeEnum.ADD_CLASS_APPLY.otherInfo[1]),className));
          noticeService.removeById(noticeId);
          noticeService.saveAndNoticeUser(notice);
          return ReturnModel.success();
      }
     @PostMapping("/agree/apply")
     public ReturnModel agreeApply(@RequestAttribute(GatewayConsistent.USER_ID) Long userId,
+                                  @RequestAttribute(GatewayConsistent.USER_NAME) String username ,
                                   @RequestParam("noticeId") Long noticeId
     ){
         Notice applyNotice = noticeService.getById(noticeId);
         Map<String, String> params = NoticeTypeEnum.ADD_CLASS_APPLY.parser(applyNotice.getContent());
         Notice notice = new Notice();
         notice.setTypeByEnum(NoticeTypeEnum.AGREE_CLASS_APPLY);
-        notice.setUserid(Long.valueOf(params.get(NoticeTypeEnum.ADD_CLASS_APPLY.otherInfo[0])));
+        notice.setUserid(params.get(NoticeTypeEnum.ADD_CLASS_APPLY.otherInfo[0]));
         notice.setTimestamp(new Date());
-        notice.setContent(NoticeTypeEnum.AGREE_CLASS_APPLY.stringify(params.get(NoticeTypeEnum.ADD_CLASS_APPLY.otherInfo[0]),params.get(NoticeTypeEnum.ADD_CLASS_APPLY.otherInfo[1])));
+        notice.setContent(NoticeTypeEnum.AGREE_CLASS_APPLY.stringify(params.get(NoticeTypeEnum.ADD_CLASS_APPLY.otherInfo[0]),username));
         noticeService.removeById(noticeId);
         noticeService.saveAndNoticeUser(notice);
         // 加入班级
@@ -242,7 +246,7 @@ public class ClassController {
         if(!classService.getById(Long.valueOf(params.get(NoticeTypeEnum.ADD_CLASS_APPLY.otherInfo[1]))).getOwner().equals(userId)){
             return ReturnModel.fail().setMessage("权限不足");
         }
-        classService.addClass(notice.getUserid(), Long.valueOf(params.get(NoticeTypeEnum.ADD_CLASS_APPLY.otherInfo[1])));
+        classService.addClass(Long.valueOf(notice.getUserid()), Long.valueOf(params.get(NoticeTypeEnum.ADD_CLASS_APPLY.otherInfo[1])));
         return ReturnModel.success();
     }
      @PostMapping("/permission/kick_out")

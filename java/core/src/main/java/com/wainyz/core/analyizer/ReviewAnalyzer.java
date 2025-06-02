@@ -72,7 +72,7 @@ public class ReviewAnalyzer {
         dataFileManager.saveCurrenQuestionFile(fileId, questionFileDO.toJsonString());
         //计算coverage和allMastery
         controllerFileDO.setCoverage(
-                calculateCoverage(controllerFileContent.length()+response.getResponse().length(), dataFileManager.getDataFileSize(fileId)));
+                calculateCoverage(controllerFileContent.length() + response.getResponse().length(), dataFileManager.getDataFileSize(fileId)));
         controllerFileDO.setAllMastery(calculateFileMastery(controllerFileDO.getCurrentMastery(), controllerFileDO.getCoverage()));
         //保存controller file
         dataFileManager.saveControllerFile(fileId, controllerFileDO.toJsonString());
@@ -108,10 +108,11 @@ public class ReviewAnalyzer {
      * @throws JsonProcessingException
      */
     public void analyzeScoringResponse(DeepSeekResponse response) throws Exception {
+
         ScoringResponse scoringResponse = ScoringRecordAnalyzer.jsonNodeToScoringResponse(response.getResponse());
-        QuestionFileDO questionFileDO = questionFileAnalyzer.getQuestionFileDO(dataFileManager.getCurrenQuestionContent(response.getId()));
+        QuestionFileDO questionFileDO = questionFileAnalyzer.getQuestionFileDO(dataFileManager.getCurrenQuestionContent(response.getParams()));
         QuestionFileDO.QuestionDO[] questions = questionFileDO.getQuestions();
-        ControllerFileDO controllerFileDO = controllerFileAnalyzer.getControllerFileDO(dataFileManager.getControllerFileContent(response.getId()));
+        ControllerFileDO controllerFileDO = controllerFileAnalyzer.getControllerFileDO(dataFileManager.getControllerFileContent(response.getParams()));
         List<ControllerFileDO.MasteryRecordDO> masteryRecords = controllerFileDO.getMasteryRecords();
         int index = 0;
         int masteryCount = 0;
@@ -137,18 +138,18 @@ public class ReviewAnalyzer {
         // 记录做题历史
         try {
             // 开始保存历史
-            String fileId = response.getId();
+            String fileId = response.getParams();
             String answerFileContent = dataFileManager.getAnswerFileContent(fileId);
             String[] answer = objectMapper.readValue(answerFileContent, String[].class);
             HistoryFileDO historyFileDO = new HistoryFileDO(questionFileDO,answer, scoringResponse);
             dataFileManager.saveHistoryQuestionFile(fileId, historyFileDO.toJsonString());
 
             //保存controller file
-            dataFileManager.saveControllerFile(response.getId(), controllerFileDO);
+            dataFileManager.saveControllerFile(response.getParams(), controllerFileDO);
         }catch (IOException e){
             throw new RuntimeException("answer等中间文件已被删除。[146]");
         }finally {
-            dataFileManager.deleteAnswerFile(response.getId());
+            dataFileManager.deleteAnswerFile(response.getParams());
         }
     }
 

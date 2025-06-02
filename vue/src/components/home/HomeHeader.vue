@@ -549,19 +549,100 @@ const hasUnreadMessages = computed(() => {
 // 添加消息到消息列表
 function addMessages(message) {
   const data = JSON.parse(message.body)
+  // 1 根据不同的notice类型，渲染不同的内容
   const newMessage = {
     id: data.id,
-    title: getNoticeTitle(data.type),
+    title: '',
     type: data.type,
     content: data.content,
     time: data.timestamp,
     read: false
   }
-  
+  switch(data.type){
+    // 1.1 SYSTEM_ALL 0通知
+    case 0:
+      newMessage.title = "系统通知"
+      newMessage.content = data.content
+      break;
+    // 1.1 ADD_FRIEND_APPLY 1通知
+    case 1:
+      newMessage.title = "好友申请"
+      //拓展文本
+      newMessage.content = "用户：" + data.content.split(",")[1] +"请求加为好友"
+      break;
+    // 1.1 AGREE_FRIEND_APPLY 2通知
+    case 2:
+      newMessage.title = "好友申请结果"
+      //拓展文本
+      newMessage.content = data.content.split(",")[1] +"同意了您的好友申请。"
+      break;
+    // 1.1 WAITING_GENERATION 3通知
+    case 3:
+      newMessage.title = data.content
+      //拓展文本
+      newMessage.content = "正在生成中..."
+      break;
+      // 1.1 WAITING_SCORING 4通知
+      case 4:
+      newMessage.title = "测试题"
+      //拓展文本
+      newMessage.content = "正在打分中..."
+      break;
+      case 5:
+      // 1.1 OVER_WAITING 5通知
+      
+      newMessage.title =  data.content.split(",")[1] +"任务完成"
+      //拓展文本
+      newMessage.content = data.content.split(",")[0]
+      // 1.1.2 删除对应的等待类型通知
+      let deleteMessageId =  data.content.split(",")[2]
+      messages.value = messages.value.filter(message => message.id !== deleteMessageId)
+      break;
+      case 6:
+        // 1.1 ADD_CLASS_APPLY 6通知
+      newMessage.title =  "班级申请"
+      //拓展文本
+      newMessage.content = `用户:${data.content.split(",")[3]} 申请加入班级: ${data.content.split(",")[4]}。\n"+"申请理由: ${data.content.split(",")[2]}`
+            break;
+      // 1.1 AGREE_CLASS_APPLY 7通知
+      case 7:
+        newMessage.title =  "班级申请成功"
+      //拓展文本
+      newMessage.content = `已加入班级  ${data.content.split(",")[1]}`
+            break;
+      // 1.1 REJECT_CLASS_APPLY 8通知
+      case 8:
+      newMessage.title =  "班级申请被拒绝"
+      //拓展文本
+      newMessage.content = `无法加入班级  ${data.content.split(",")[1]}`
+            break;
+      // 1.1 REJECT_FRIEND_APPLY 9通知
+      case 9:
+        //TODO: 暂时没做
+            break;
+        // 1.1 KICK_OUT_CLASS 10通知
+      case 10:
+         //TODO: 暂时没做
+            break;
+         // 1.1 CLASS_UPDATE 11通知
+      case 11:
+        newMessage.title =  "班级信息更新"
+      //拓展文本
+      newMessage.content = `${data.content.split(",")[2]} 信息更新提示: ${data.content.split(",")[1]}`
+            break;
+      // 1.1 SYSTEM_ONE -1通知
+      case -1:
+        newMessage.title = "系统通知"
+        newMessage.content = data.content
+              break;
+
+  }
+  // 如果是over类型的通知，那么需要对应删除wating对应的通知。
   // 使用数组解构来创建新的数组，确保触发响应式更新
   messages.value = [newMessage, ...messages.value]
   unreadCount.value = messages.value.filter(msg => !msg.read).length
 }
+// STOMP 消息订阅----------------
 
 // 订阅全局通知
 let globalNotificationSubscription = webSocketService.subscribeToGlobalNotifications((message) => {
@@ -575,9 +656,12 @@ let globalNotificationSubscription = webSocketService.subscribeToGlobalNotificat
 let userNotificationSubscription = webSocketService.subscribeToUserNotifications((message) => {
   const data = JSON.parse(message.body);
   console.log('收到用户通知:', data);
+  //弹出消息
   handleStompMessage(message);
+  //存入通知列表
   addMessages(message);
 });
+// STOMP 消息订阅===============
 
 // 模拟获取消息数据
 const fetchMessages = async () => {

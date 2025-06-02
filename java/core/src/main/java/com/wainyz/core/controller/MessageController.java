@@ -80,7 +80,7 @@ public class MessageController {
         notice.setTypeByEnum(NoticeTypeEnum.FriendMessage);
         notice.setContent(content);
         notice.setTimestamp(new Date());
-        notice.setUserid(friendId);
+        notice.setUserid(String.valueOf(friendId));
         webSocketMessageService.sendMessageToUser(notice);
 
         return ReturnModel.success();

@@ -21,8 +21,11 @@ public class DeepSeekRequestDO {
     @JsonProperty("userId")
     private String userId;
 
-    @JsonProperty("fileId")
-    private String fileId;
+    @JsonProperty("messageId")
+    private String messageId;
+    // params  csv格式。
+    @JsonProperty("params")
+    private String params;
 
     @JsonProperty("requestEnum")
     private DeepSeekRequestEnum deepSeekRequestEnum;
@@ -34,11 +37,19 @@ public class DeepSeekRequestDO {
         GENERATE_TEST(0,"测试题生成中..."),SCORING_ANSWERS(1,"批改题目中..."), GENERATE_PAPER(3, "试卷生成中...");
         @JsonValue
         private int typeCode;
-        private String chineseName;
+        public String chineseName;
 
         DeepSeekRequestEnum(int typeCode, String chineseName) {
             this.typeCode = typeCode;
             this.chineseName = chineseName;
+        }
+        public static DeepSeekRequestEnum getEnum(int typeCode) {
+            for (DeepSeekRequestEnum value : values()) {
+                if (value.typeCode == typeCode) {
+                    return value;
+                }
+            }
+            return null;
         }
     }
 }

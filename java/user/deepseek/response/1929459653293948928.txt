@@ -1,0 +1,1 @@
+{"questionNum":2,"questions":[{"raw":"--hjkl 以及在normal模式下的<enter><back><空格>","question":"在Vim的normal模式下，哪些键用于移动光标？","correct":"hjkl","recordIndex":1},{"raw":"我们最常用的就是食指,以及下一行移动,所以j就是下一行,以及<enter>也是下一行的意思","question":"在Vim中，哪个键用于移动到下一行？","correct":"j或<enter>","recordIndex":2}]}

@@ -102,10 +102,10 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, Class>
             Notice notice = new Notice();
             if (objectMapper.readTree(oldInfo.getStudentList()) != null) {
                 for (Long studentId : objectMapper.readValue(oldInfo.getStudentList(), Long[].class)) {
-                    notice.setUserid(studentId);
+                    notice.setUserid(String.valueOf(studentId));
                     notice.setTypeByEnum(NoticeTypeEnum.CLASS_UPDATE);
                     notice.setTimestamp(new Date());
-                    notice.setId(IdUtil.getSnowflake().nextId());
+                    notice.setId(String.valueOf(IdUtil.getSnowflake().nextId()));
                     String updateInfo = "";
                     //如果用户不在列表中，则被kick out
                     if (!newClass.getStudentList().contains(studentId.toString())) {
@@ -123,7 +123,7 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, Class>
                         }
                     }
                     //否则推送更新消息
-                    notice.setContent(NoticeTypeEnum.CLASS_UPDATE.stringify(String.valueOf(newClass.getId()), updateInfo));
+                    notice.setContent(NoticeTypeEnum.CLASS_UPDATE.stringify(String.valueOf(newClass.getId()), updateInfo, oldInfo.getClassName()));
                     noticeService.saveAndNoticeUser(notice);
                 }
             } else {
@@ -146,15 +146,15 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, Class>
     }
 
     @Override
-    public void applyAddClass(Long userId, Long classId, String description) throws Exception {
+    public void applyAddClass(Long userId, Long classId, String description, String username, String className) throws Exception {
         Class byId = getById(classId);
         if (byId != null) {
             Notice notice = new Notice();
             notice.setTypeByEnum(NoticeTypeEnum.ADD_CLASS_APPLY);
-            notice.setUserid(byId.getOwner());
+            notice.setUserid(String.valueOf(byId.getOwner()));
             notice.setTimestamp(new Date());
-            notice.setId(IdUtil.getSnowflake().nextId());
-            notice.setContent(NoticeTypeEnum.ADD_CLASS_APPLY.stringify(String.valueOf(userId), String.valueOf(classId), description));
+            notice.setId(String.valueOf(IdUtil.getSnowflake().nextId()));
+            notice.setContent(NoticeTypeEnum.ADD_CLASS_APPLY.stringify(String.valueOf(userId), String.valueOf(classId), description,username,className));
             noticeService.saveAndNoticeUser(notice);
         } else {
             throw new Exception("[104]班级不存在");
@@ -165,8 +165,9 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, Class>
     public void rebackApply(Long userId, Long noticeId, int reback) throws Exception {
         // 首先先去查询是否有这个用户的请求
         Notice byId = noticeService.getById(noticeId);
-        String applyUserId = byId.getContent().split(",")[0].substring(NoticeTypeEnum.ADD_CLASS_APPLY.otherInfo[0].length() + 1);
-        String applyGoalClassId = byId.getContent().split(",")[1].substring(NoticeTypeEnum.ADD_CLASS_APPLY.otherInfo[1].length() + 1);
+        String applyUserId = byId.getContent().split(",")[0];
+        String applyGoalClassId = byId.getContent().split(",")[1];
+        String className = byId.getContent().split(",")[4];
 
         boolean permission = lambdaQuery().eq(Class::getId, applyGoalClassId).eq(Class::getOwner, userId).count() != 0;
         if (!permission) {
@@ -174,7 +175,7 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, Class>
         }
         if (reback == 0) {
             //表示拒绝
-            Notice build = Notice.build(Long.valueOf(applyUserId), NoticeTypeEnum.REJECT_CLASS_APPLY, applyGoalClassId);
+            Notice build = Notice.build(applyUserId, NoticeTypeEnum.REJECT_CLASS_APPLY, applyGoalClassId);
             noticeService.saveAndNoticeUser(build);
         } else {
             Class classObject = getById(applyGoalClassId);
@@ -185,7 +186,7 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, Class>
             List<Long> classesByList = byId1.getClassesByList();
             classesByList.add(Long.valueOf(applyGoalClassId));
             myClassListService.updateById(new MyClassList().setId(Long.valueOf(applyUserId)).setClassesByList(classesByList));
-            noticeService.saveAndNoticeUser(Notice.build(Long.valueOf(applyUserId), NoticeTypeEnum.AGREE_CLASS_APPLY, applyGoalClassId));
+            noticeService.saveAndNoticeUser(Notice.build(applyUserId, NoticeTypeEnum.AGREE_CLASS_APPLY, applyGoalClassId, className));
         }
 
     }

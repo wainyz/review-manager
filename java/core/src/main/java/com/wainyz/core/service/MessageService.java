@@ -48,7 +48,7 @@ public class MessageService {
         notice.setTypeByEnum(NoticeTypeEnum.FriendMessage);
         notice.setContent(content);
         notice.setTimestamp(new Date());
-        notice.setUserid(friendId);
+        notice.setUserid(String.valueOf(friendId));
         webSocketMessageService.sendMessageToUser(notice);
         //检查endtime
         long endtime = Long.parseLong(redisOps.get(endTimeKey));
@@ -123,11 +123,11 @@ public class MessageService {
         // 首先 先存放在redis中。具体的格式如下:
         redisOps.safeAppendToList(messageKey, List.of(content));
         Notice notice = new Notice();
-        notice.setId(IdUtil.getSnowflakeNextId());
+        notice.setId(String.valueOf(IdUtil.getSnowflakeNextId()));
         notice.setTypeByEnum(NoticeTypeEnum. ClassMessage);
         notice.setContent(content);
         notice.setTimestamp(new Date());
-        notice.setUserid(userId);
+        notice.setUserid(String.valueOf(userId));
         webSocketMessageService.sendMessageToClass(notice, classId);
     }
     public List<ClassMessage> listClassMessage(Long classId){

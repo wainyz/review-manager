@@ -86,11 +86,11 @@ public class NoticeController {
             return ReturnModel.fail().setMessage("权限不足");
         }
         Notice notice = new Notice();
-        notice.setId(IdUtil.getSnowflake().nextId());
+        notice.setId(String.valueOf(IdUtil.getSnowflake().nextId()));
         notice.setTimestamp(new Date());
         notice.setTypeByEnum(NoticeTypeEnum.SYSTEM_ALL);
         notice.setContent(noticeContent);
-        notice.setUserid(-1L);
+        notice.setUserid(String.valueOf(-1L));
         if (noticeService.saveAndNoticeUser(notice)) {
             return ReturnModel.success().setMessage("通知成功.");
         }else{
@@ -105,11 +105,11 @@ public class NoticeController {
             return ReturnModel.fail().setMessage("权限不足");
         }
         Notice notice = new Notice();
-        notice.setId(IdUtil.getSnowflake().nextId());
+        notice.setId(String.valueOf(IdUtil.getSnowflake().nextId()));
         notice.setTimestamp(new Date());
         notice.setTypeByEnum(NoticeTypeEnum.SYSTEM_ONE);
         notice.setContent(content);
-        notice.setUserid(noticeGoal);
+        notice.setUserid(String.valueOf(noticeGoal));
         if (noticeService.saveAndNoticeUser(notice)) {
             return ReturnModel.success().setMessage("通知成功.");
         }else{

@@ -26,8 +26,10 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
+import static com.wainyz.core.pojo.domain.DeepSeekRequestDO.DeepSeekRequestEnum.GENERATE_PAPER;
+import static com.wainyz.core.pojo.domain.DeepSeekRequestDO.DeepSeekRequestEnum.GENERATE_TEST;
 
 /**
  * @author Yanion_gwgzh
@@ -109,42 +111,41 @@ public class RabbitMQConsumer {
     private final String id_endWith_string = "exam";
     private void processGenerateQuestionMessage(DeepSeekResponse message) {
         // 实现具体业务逻辑
-        logger.info("【110】Processing message: {}", message);
-        Notice newNotice = new Notice();
-        newNotice.setTypeByEnum(NoticeTypeEnum.OVER_WAITING);
+        logger.info("【110】处理生成测试题的大模型响应: {}", message);
+        // 1 更新平均等待时间
+        updateWaitingTime(Long.valueOf(message.getId()));
+        // 2 组装 等待完成 通知
+        Notice overNotice = new Notice();
+        overNotice.setId(String.valueOf(IdUtil.getSnowflakeNextId()));
+        overNotice.setUserid(message.getUserId());
+        overNotice.setTimestamp(new Date());
+        overNotice.setTypeByEnum(NoticeTypeEnum.OVER_WAITING);
         try {
-            //判断是exam 还是 question, 根据message.getId 是否endWith exam 字符串
-            if(message.getId().endsWith(id_endWith_string)){
-                message.setId(message.getId().replace(id_endWith_string,""));
-                //更新平均等待时间
-                updateWaitingTime(Long.valueOf(message.getId()));
-                // 获取 fileId，实际上是noticeId作为paperId
-                String paperId = message.getId();
+            //判断是exam 还是 test,
+            if(message.getDeepSeekRequestEnum().equals(GENERATE_PAPER)){
+                // 3 保存paper
                 Paper paper = new Paper();
-                paper.setId(paperId);
+                paper.setId(message.getId());
                 paper.setUserId(message.getUserId());
                 paper.setContent(message.getResponse());
-                Notice notice = noticeService.getById(message.getId());
-                Map<String, String> parser = NoticeTypeEnum.WAITING_GENERATION.parser(notice.getContent());
-                paper.setTitle(parser.get(NoticeTypeEnum.WAITING_GENERATION.otherInfo[0]));
-                // 创建 完成通知，通知相关用户。
+                paper.setTitle(message.getParams());
+                // Warning: 可能的错误：paper保存完毕即通知相关用户。
                 if (!paperService.save(paper)) {
                     throw new IOException("保存失败。");
                 }
-                newNotice.setContent(NoticeTypeEnum.OVER_WAITING.stringify(String.valueOf(1),message.getId()));
-            }else{
-                // else
-                reviewAnalyzer.analyzeGenerateQuestionResponse(message.getId(), message);
-                newNotice.setContent(NoticeTypeEnum.OVER_WAITING.stringify(String.valueOf(0),message.getId()));
+                // 2.1 完成组装 等待完成 通知。
+                overNotice.setContent(NoticeTypeEnum.OVER_WAITING.stringify(message.getParams(),"1",message.getId()));
+            }else if(message.getDeepSeekRequestEnum().equals(GENERATE_TEST)){
+                // 3 分析并保存test
+                reviewAnalyzer.analyzeGenerateQuestionResponse(message.getParams(), message);
+                //2.1 完成组装 等待完成 通知。
+                overNotice.setContent(NoticeTypeEnum.OVER_WAITING.stringify("测试题",String.valueOf(0),message.getId()));
             }
-            //  删除等待通知，新建完成同桌
+            // 4 删除 等待通知
             boolean b = noticeService.removeById(message.getId());
             if (b){
-                newNotice.setTimestamp(new Date());
-                newNotice.setUserid(Long.valueOf(message.getUserId()));
-                newNotice.setId(IdUtil.getSnowflakeNextId());
-                newNotice.setContent(NoticeTypeEnum.OVER_WAITING.stringify());
-                noticeService.saveAndNoticeUser(newNotice);
+                // 5 保存并发送 完成等待通知
+                noticeService.saveAndNoticeUser(overNotice);
             }else{
                 throw new IOException("[149]无法删除旧通知。");
             }
@@ -197,10 +198,14 @@ public class RabbitMQConsumer {
     public void processScoringMessage(DeepSeekResponse message) {
         // 实现具体业务逻辑
         logger.info("Processing Scoring Message: {}", message);
-        // 解析message
         try {
+            // 1 处理逻辑
             reviewAnalyzer.analyzeScoringResponse(message);
-
+            // 2 移除旧地等待通知
+            noticeService.removeById(message.getId());
+            // 2 构建、保存、发送 完成等待通知
+            Notice build = Notice.build(message.getUserId(), NoticeTypeEnum.OVER_WAITING, "测试题", String.valueOf(3), message.getId());
+            noticeService.saveAndNoticeUser(build);
         }catch (JsonProcessingException e){
             logger.error("[130]JsonProcessingException: {}", e.getMessage());
         } catch (IOException e) {

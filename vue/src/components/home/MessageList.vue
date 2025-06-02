@@ -215,35 +215,36 @@ const calculateProgress = (message) => {
   if (elapsedTime >= totalWaitTime) {
     return 99; // 最大值为99%
   }
+  return (elapsedTime/totalWaitTime)*100
 
-  let progress;
+  // let progress;
 
 
-  const realProgress = elapsedTime * 100 / totalWaitTime;
+  // const realProgress = elapsedTime * 100 / totalWaitTime;
 
-  let randomSpeed = messageSpeed.value[message.id] ; // 随机速度
-  if(isNaN(randomSpeed)){
-      startTimeMap.value[message.id] = message.time;
-      messageSpeed.value[message.id] = Math.random();
-  }
-  let speed =  randomSpeed;
-  if (realProgress <= 30) {
-    // 前30% 到
+  // let randomSpeed = messageSpeed.value[message.id] ; // 随机速度
+  // if(isNaN(randomSpeed)){
+  //     startTimeMap.value[message.id] = message.time;
+  //     messageSpeed.value[message.id] = Math.random();
+  // }
+  // let speed =  randomSpeed;
+  // if (realProgress <= 30) {
+  //   // 前30% 到
    
-    progress = realProgress * (1 + speed);
-  } else if (realProgress <= 70) {
-    // 从80%到90%继续线性增长;
-    progress = realProgress * (1.2 + speed);
-  } else {
-    // 从70%到99%指数级减缓
-    progress = realProgress * (1.3 + speed);
-  }
-  if (progress > 99) {
-      progress = 99; // 最大值为99%
-    }
-  //TODO 这里有报错
-  // console.log("平均等待时间，以及当前执行时间(s):",totalWaitTime,elapsedTime)
-  // console.log("计算得到的进度：",message.id,realProgress,progress)
+  //   progress = realProgress * (1 + speed);
+  // } else if (realProgress <= 70) {
+  //   // 从80%到90%继续线性增长;
+  //   progress = realProgress * (1.2 + speed);
+  // } else {
+  //   // 从70%到99%指数级减缓
+  //   progress = realProgress * (1.3 + speed);
+  // }
+  // if (progress > 99) {
+  //     progress = 99; // 最大值为99%
+  //   }
+  // //TODO 这里有报错
+  // // console.log("平均等待时间，以及当前执行时间(s):",totalWaitTime,elapsedTime)
+  // // console.log("计算得到的进度：",message.id,realProgress,progress)
   return progress;
 }
 

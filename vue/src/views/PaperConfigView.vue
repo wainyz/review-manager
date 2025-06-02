@@ -275,15 +275,11 @@ const generatePaper = async () => {
     )
     console.log((await response).data)
     // // 后端返回生成的试卷 ID
-    const paperId = response.data.id
-
-    // // 跳转到试卷编辑页面
-     router.push(`/paper/edit/${paperId}`)
 
     // 页面滚动到顶部
     window.scrollTo(0, 0)
-
-    ElMessage.success('试卷生成成功！')
+    ElMessage.success((await response).data.message)
+      router.push('/home')
 
   } catch (error) {
     // 请求失败时的错误处理

@@ -3,7 +3,6 @@ package com.wainyz.core.utils;
 
 import cn.hutool.core.util.IdUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wainyz.commons.consistent.RabbitMqConsistent;
 import com.wainyz.core.consident.NoticeTypeEnum;
@@ -41,34 +40,42 @@ public class MessageSender {
  * @return
  */
     public Notice sendDeepSeekRequest(DeepSeekRequestDO requestDO) throws JsonProcessingException {
-        // 设置messageId,作为去重的标识
-        Long noticeId =  IdUtil.getSnowflakeNextId();
-        requestDO.setFileId(noticeId.toString());
-        String messageId = requestDO.getUserId()+":"+noticeId;
+        // 1生成notice
+        if(requestDO.getMessageId()==null ||requestDO.getMessageId().isEmpty()){
+            requestDO.setMessageId(String.valueOf(IdUtil.getSnowflake().nextId()));
+        }
+        Notice waitingNotice = getNoticeFormDeepSeekRequestDO(requestDO);
+        //  2保存并发送notice
+        noticeService.saveAndNoticeUser(waitingNotice);
+        // 3 发送rabbitMq消息
         rabbitTemplate.convertAndSend(RabbitMqConsistent.EXCHANGE_NAME, RabbitMqConsistent.ROUTING_KEY, requestDO, message -> {
-            message.getMessageProperties().setMessageId(messageId);
+            message.getMessageProperties().setMessageId(String.valueOf(requestDO.getMessageId()));
             return message;
         });
-        //生成等待通知
-        Notice notice = new Notice();
-        notice.setId(noticeId);
-        if( requestDO.getDeepSeekRequestEnum() == DeepSeekRequestDO.DeepSeekRequestEnum.GENERATE_PAPER){
-            JsonNode jsonNode = objectMapper.readTree(requestDO.getUserContent());
-            notice.setTypeByEnum(NoticeTypeEnum.WAITING_GENERATION);
-            notice.setContent(NoticeTypeEnum.WAITING_GENERATION.stringify(jsonNode.get("name").asText()));
-        }else if(requestDO.getDeepSeekRequestEnum() == DeepSeekRequestDO.DeepSeekRequestEnum.GENERATE_TEST){
-            notice.setType(NoticeTypeEnum.WAITING_GENERATION.value);
-            notice.setContent(requestDO.getDeepSeekRequestEnum().getChineseName());
-        }else{
-            notice.setType(NoticeTypeEnum.WAITING_SCORING.value);
-            notice.setContent(requestDO.getDeepSeekRequestEnum().getChineseName());
+        return waitingNotice;
+    }
+
+    private static Notice getNoticeFormDeepSeekRequestDO(DeepSeekRequestDO requestDO) {
+        Notice waitingNotice = new Notice();
+        waitingNotice.setId(requestDO.getMessageId());
+        waitingNotice.setUserid(requestDO.getUserId());
+        waitingNotice.setTimestamp(new Date());
+        switch (requestDO.getDeepSeekRequestEnum()){
+            case GENERATE_TEST -> {
+                waitingNotice.setTypeByEnum(NoticeTypeEnum.WAITING_GENERATION);
+                waitingNotice.setContent(requestDO.getDeepSeekRequestEnum().chineseName);
+            }
+            case SCORING_ANSWERS -> {
+                waitingNotice.setTypeByEnum(NoticeTypeEnum.WAITING_SCORING);
+                waitingNotice.setContent(requestDO.getDeepSeekRequestEnum().chineseName);
+            }
+            case GENERATE_PAPER -> {
+                // 设置title
+                waitingNotice.setTypeByEnum(NoticeTypeEnum.WAITING_GENERATION);
+                waitingNotice.setContent(NoticeTypeEnum.WAITING_GENERATION.stringify(requestDO.getParams()));
+            }
+            default -> throw new RuntimeException("未知的请求类型");
         }
-        notice.setTimestamp(new Date());
-        notice.setUserid(Long.valueOf(requestDO.getUserId()));
-        noticeService.saveAndNoticeUser(notice);
-//        if (quickStatusManager.shouldBeginRecordSend()){
-//            quickStatusManager.sendRecord(messageId);
-//        }
-        return notice;
+        return waitingNotice;
     }
 }

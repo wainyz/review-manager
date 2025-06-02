@@ -14,7 +14,9 @@ public class DeepSeekResponse implements Serializable {
 
     private String id;
     private String userId;
+    private String params;
     private String response;
+    private DeepSeekRequestDO.DeepSeekRequestEnum deepSeekRequestEnum;
     // 方案1：添加默认构造器
     public DeepSeekResponse() {}
 
@@ -22,10 +24,15 @@ public class DeepSeekResponse implements Serializable {
     @JsonCreator
     public DeepSeekResponse(
             @JsonProperty("id") String id,
-            @JsonProperty("response") String response
+            @JsonProperty("userId") String userId,
+            @JsonProperty("params") String params,
+            @JsonProperty("response") String response,
+            @JsonProperty("deepSeekRequestEnum") int deepSeekRequestEnum
     ) {
-        this.userId = id.substring(0, id.indexOf(":"));
-        this.id = id.substring(userId.length()+1);
+        this.userId = userId;
+        this.params = params;
+        this.id = id;
         this.response = response;
+        this.deepSeekRequestEnum = DeepSeekRequestDO.DeepSeekRequestEnum.getEnum(deepSeekRequestEnum);
     }
 }

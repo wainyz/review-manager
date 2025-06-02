@@ -2,7 +2,6 @@ package com.wainyz.core.service.impl;
 
 import cn.hutool.core.util.IdUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.wainyz.core.consident.NoticeTypeEnum;
 import com.wainyz.core.mapper.NoticeMapper;
 import com.wainyz.core.pojo.domain.Notice;
@@ -10,6 +9,7 @@ import com.wainyz.core.service.NoticeService;
 import com.wainyz.core.service.WebSocketMessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.util.Date;
 import java.util.List;
 
@@ -37,13 +37,13 @@ public class NoticeServiceImpl extends ServiceImpl<NoticeMapper, Notice>
      * @return
      */
     @Override
-    public boolean addFriendApplyNotice(Long userId, Long friendId) {
+    public boolean addFriendApplyNotice(Long userId, String username, Long friendId) {
         // 发送通知
         Notice notice = new Notice();
-        notice.setId(IdUtil.getSnowflake().nextId());
+        notice.setId(String.valueOf(IdUtil.getSnowflake().nextId()));
         notice.setTypeByEnum(NoticeTypeEnum.ADD_FRIEND_APPLY);
-        notice.setContent(NoticeTypeEnum.ADD_FRIEND_APPLY.stringify(userId.toString(),friendId.toString()));
-        notice.setUserid(friendId);
+        notice.setContent(NoticeTypeEnum.ADD_FRIEND_APPLY.stringify(userId.toString(),username ));
+        notice.setUserid(String.valueOf(friendId));
         notice.setTimestamp(new Date());
         // 保存和通知
         return saveAndNoticeUser(notice);
@@ -56,14 +56,14 @@ public class NoticeServiceImpl extends ServiceImpl<NoticeMapper, Notice>
      * @return
      */
     @Override
-    public boolean agreeFriendApplyNotice(Long userId, Long friendId) {
+    public boolean agreeFriendApplyNotice(Long userId,String username, Long friendId) {
         //检查 是否有申请通知
         Notice one = null;
         try {
             one = lambdaQuery()
                     .eq(Notice::getType, NoticeTypeEnum.ADD_FRIEND_APPLY.value)
                     .eq(Notice::getUserid, userId)
-                    .like(Notice::getContent, NoticeTypeEnum.ADD_FRIEND_APPLY.otherInfo[0] + "=" + friendId + ",%").list().get(0);
+                    .like(Notice::getContent, friendId + ",%").list().get(0);
         }catch (Exception ignored){}
         if( one == null){
             return false;
@@ -72,27 +72,22 @@ public class NoticeServiceImpl extends ServiceImpl<NoticeMapper, Notice>
         removeById(one);
         //新建 通过申请的通知
         Notice notice = new Notice();
-        notice.setId(IdUtil.getSnowflake().nextId());
+        notice.setId(String.valueOf(IdUtil.getSnowflake().nextId()));
         notice.setTimestamp(new Date());
         notice.setTypeByEnum(NoticeTypeEnum.AGREE_FRIEND_APPLY);
-        notice.setUserid(friendId);
-        notice.setContent(NoticeTypeEnum.AGREE_FRIEND_APPLY.stringify(friendId.toString(), userId.toString()));
+        notice.setUserid(String.valueOf(friendId));
+        notice.setContent(NoticeTypeEnum.AGREE_FRIEND_APPLY.stringify(friendId.toString(), username));
         return saveAndNoticeUser(notice);
         // 保存好友到数据库的操作放在friendService中
     }
 
     @Override
     public boolean saveAndNoticeUser(Notice notice) {
-        try {
-            if (save(notice)) {
-                // 通知在线用户
-                webSocketMessageService.noticeSomeUser(notice);
-                return true;
-            }else{
-                return false;
-            }
-        }catch (JsonProcessingException e){
-            e.printStackTrace();
+        if (save(notice)) {
+            // 通知在线用户
+            webSocketMessageService.sendMessageToUser(notice);
+            return true;
+        }else{
             return false;
         }
     }

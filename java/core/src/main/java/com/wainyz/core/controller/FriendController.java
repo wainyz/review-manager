@@ -36,7 +36,9 @@ public class FriendController {
      * @return
      */
     @GetMapping("/apply/add/{friendId}")
-    public ReturnModel applyAddFriend(@PathVariable("friendId")Long friendId, @RequestAttribute(GatewayConsistent.USER_ID) Long userId){
+    public ReturnModel applyAddFriend(@PathVariable("friendId")Long friendId,
+                                      @RequestAttribute(GatewayConsistent.USER_NAME) String username,
+                                      @RequestAttribute(GatewayConsistent.USER_ID) Long userId){
         Long smallId = userId < friendId? userId: friendId;
         Long bigId = !userId.equals(smallId) ? userId: friendId;
         // 检查是否是合法用户
@@ -48,13 +50,13 @@ public class FriendController {
         count = noticeService.lambdaQuery()
                 .eq(Notice::getUserid, friendId)
                 .eq(Notice::getType, NoticeTypeEnum.ADD_FRIEND_APPLY.value)
-                .like(Notice::getContent, NoticeTypeEnum.ADD_FRIEND_APPLY.otherInfo[0] + "=" + userId + ",%")
+                .like(Notice::getContent,  userId + ",%")
                 .count();
         if(count != 0 ){
             return ReturnModel.fail().setMessage("已存在好友申请。");
         }
         // 发送通知
-        if (noticeService.addFriendApplyNotice(userId,friendId)) {
+        if (noticeService.addFriendApplyNotice(userId,username,friendId)) {
             return ReturnModel.success();
         }else{
             return ReturnModel.fail();
@@ -67,11 +69,13 @@ public class FriendController {
      * @return
      */
     @GetMapping("/apply/agree/{friendId}")
-    public ReturnModel applyAgreeFriend(@PathVariable("friendId")Long friendId, @RequestAttribute(GatewayConsistent.USER_ID) Long userId){
+    public ReturnModel applyAgreeFriend(@PathVariable("friendId")Long friendId,
+                                        @RequestAttribute(GatewayConsistent.USER_ID) Long userId,
+      @RequestAttribute(GatewayConsistent.USER_NAME) String username    ){
         Long smallId = userId < friendId? userId: friendId;
         Long bigId = userId != smallId? userId: friendId;
         // 发送通知(校验步骤包含在这里面，所以将保存到数据库的操作放在后面)
-        if (noticeService.agreeFriendApplyNotice(userId,friendId)) {
+        if (noticeService.agreeFriendApplyNotice(userId,username,friendId)) {
             Friends friends = new Friends();
             friends.setId(IdUtil.getSnowflake().nextId());
             friends.setSmallid(smallId);

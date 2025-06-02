@@ -1,0 +1,1 @@
+{"coverage":100,"allMastery":0,"currentMastery":0,"masteryRecords":[{"raw":"--hjkl 以及在normal模式下的<enter><back><空格>","mastery":0,"attenuationLevel":5,"firstTime":1748854015},{"raw":"我们最常用的就是食指,以及下一行移动,所以j就是下一行,以及<enter>也是下一行的意思","mastery":0,"attenuationLevel":5,"firstTime":1748854015}]}

@@ -197,7 +197,7 @@ ${other_prompt}
         deepSeekRequestDO.setSystemPrompt(prompt);
         deepSeekRequestDO.setUserContent(mustHave);
         deepSeekRequestDO.setUserId(userId);
-        deepSeekRequestDO.setFileId(fileId);
+        deepSeekRequestDO.setParams(fileId);
         deepSeekRequestDO.setDeepSeekRequestEnum(DeepSeekRequestDO.DeepSeekRequestEnum.GENERATE_TEST);
         return deepSeekRequestDO;
     }
@@ -216,7 +216,7 @@ ${other_prompt}
         deepSeekRequestDO.setSystemPrompt(SCORING_ANSWER_PROMPT);
         deepSeekRequestDO.setUserContent("{questions: "+questions+", answer: "+answer+"}");
         deepSeekRequestDO.setUserId(userId);
-        deepSeekRequestDO.setFileId(fileId);
+        deepSeekRequestDO.setParams(fileId);
         deepSeekRequestDO.setDeepSeekRequestEnum(DeepSeekRequestDO.DeepSeekRequestEnum.SCORING_ANSWERS);
         return deepSeekRequestDO;
     }

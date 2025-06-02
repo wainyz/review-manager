@@ -28,7 +28,7 @@ public class WebSocketMessageService {
         if(notice.getType().equals(NoticeTypeEnum.SYSTEM_ALL.value)){
             noticeAllUsers(notice);
         } else {
-            noticeToUser(notice.getUserid(), notice);
+            noticeToUser(Long.valueOf(notice.getUserid()), notice);
         }
     }
 

@@ -1,25 +1,22 @@
 package com.wainyz.core.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wainyz.commons.consistent.GatewayConsistent;
 import com.wainyz.commons.pojo.vo.ReturnModel;
 import com.wainyz.core.manager.PromptManager;
 import com.wainyz.core.pojo.domain.DeepSeekRequestDO;
-import com.wainyz.core.pojo.domain.Notice;
+import com.wainyz.core.pojo.domain.Paper;
 import com.wainyz.core.service.PaperService;
-import com.wainyz.core.service.RabbitMQConsumer;
 import com.wainyz.core.service.UserFileService;
+import com.wainyz.core.service.WebSocketMessageService;
 import com.wainyz.core.utils.MessageSender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import com.wainyz.core.pojo.domain.Paper;
-import java.util.HashMap;
+
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/paper")
@@ -35,6 +32,8 @@ public class PaperController {
     private PaperService paperService;
     @Autowired
     private ObjectMapper objectMapper;
+    @Autowired
+    private WebSocketMessageService webSocketMessageService;
     Logger logger = LoggerFactory.getLogger(PaperController.class);
 
     //=================1======================
@@ -48,23 +47,18 @@ public class PaperController {
             @RequestAttribute(GatewayConsistent.USER_ID) String userId,
             @RequestParam("paperConfig") String paperConfigJson
     ) throws JsonProcessingException {
-        // 生成提示词
+        // 1 构建deepseek请求对象
         String generateQuestionAutoPrompt = PromptManager.PAPER_GENERATE_PROMPT;
         DeepSeekRequestDO deepSeekRequestDO = new DeepSeekRequestDO();
         deepSeekRequestDO.setUserId(userId);
         deepSeekRequestDO.setSystemPrompt(generateQuestionAutoPrompt);
         deepSeekRequestDO.setUserContent(paperConfigJson);
         deepSeekRequestDO.setDeepSeekRequestEnum(DeepSeekRequestDO.DeepSeekRequestEnum.GENERATE_PAPER);
-        Notice notice = messageSender.sendDeepSeekRequest(deepSeekRequestDO);
-        JsonNode jsonNode = objectMapper.readTree(paperConfigJson);
-        Map<String, Long> stringLongHashMap = new HashMap<>();
-        stringLongHashMap.put("averageWaitTime", (long) RabbitMQConsumer.getAverageWaitingTime());
-        stringLongHashMap.put("noticeId", notice.getId());
-        return ReturnModel.success()
-                .setMessage(jsonNode.get("name").textValue() +" 试卷生成中...")
-                .setData(
-                       stringLongHashMap
-                );
+        String title = objectMapper.readTree(paperConfigJson).get("name").textValue();
+        deepSeekRequestDO.setParams(title);
+        // 2 发送deepseek请求
+        messageSender.sendDeepSeekRequest(deepSeekRequestDO);
+        return ReturnModel.success();
     }
     /**
      * 获取所有自己的试卷

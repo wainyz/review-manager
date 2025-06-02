@@ -197,9 +197,9 @@ public class WebsocketControllerTests {
         lastRead.setTimestamp(Date.from(LocalDateTime.of(2024,1,1,1,1,1).toInstant(ZoneOffset.UTC)));
         lastReadService.save(lastRead);
         // 存储两条notice，2023 id=1和2025的id=2
-        Notice notice1 = Notice.getTestObject(1L);
+        Notice notice1 = Notice.getTestObject(String.valueOf(1L));
         notice1.setTimestamp(Date.from(LocalDateTime.of(2023,1,1,1,1,1).toInstant(ZoneOffset.UTC)));
-        Notice notice2 = Notice.getTestObject(2L);
+        Notice notice2 = Notice.getTestObject(String.valueOf(2L));
         notice2.setTimestamp(Date.from(LocalDateTime.of(2025,1,1,1,1,1).toInstant(ZoneOffset.UTC)));
         noticeService.removeById(1);
         noticeService.removeById(2);

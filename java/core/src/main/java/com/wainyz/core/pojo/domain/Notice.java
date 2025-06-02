@@ -23,7 +23,7 @@ public class Notice implements Serializable {
      */
 //    @NotNull(message="[]不能为空")
 //    @ApiModelProperty("")
-    private Long id;
+    private String id;
     /**
     *
      * -- GETTER --
@@ -32,7 +32,7 @@ public class Notice implements Serializable {
      */
 //    @NotNull(message="[]不能为空")
 //    @ApiModelProperty("")
-    private Long userid;
+    private String userid;
     /**
     *
      * -- GETTER --
@@ -66,20 +66,20 @@ public class Notice implements Serializable {
     public void setTypeByEnum(NoticeTypeEnum type){
         this.type = type.value;
     }
-    public static Notice getTestObject(Long id){
+    public static Notice getTestObject(String id){
         Notice notice = new Notice();
         notice.setId(id);
         notice.setTimestamp(new Date());
-        notice.setUserid(-1L);
+        notice.setUserid("-1");
         notice.setType(0);
         notice.setContent("test notice");
         return notice;
     }
-    public static Notice build(Long userid, NoticeTypeEnum type, String...  params){
+    public static Notice build(String userid, NoticeTypeEnum type, String...  params){
         Notice notice = new Notice();
         notice.setTimestamp(new Date());
-        notice.setId(IdUtil.getSnowflake().nextId());
-        notice.setUserid( userid);
+        notice.setId(String.valueOf(IdUtil.getSnowflake().nextId()));
+        notice.setUserid(userid);
         notice.setTypeByEnum(type);
         notice.setContent(type.stringify(params));
         return notice;

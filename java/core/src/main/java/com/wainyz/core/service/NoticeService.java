@@ -12,7 +12,9 @@ import java.util.List;
 */
 public interface NoticeService extends IService<Notice> {
     List<Notice> getUserAllNotice(Long userId);
-    boolean addFriendApplyNotice(Long userId, Long friendId);
-    boolean agreeFriendApplyNotice(Long userId, Long friendId);
+
+    boolean addFriendApplyNotice(Long userId, String username, Long friendId);
+
+    boolean agreeFriendApplyNotice(Long userId,String username, Long friendId);
     boolean saveAndNoticeUser(Notice notice);
 }
