@@ -61,6 +61,7 @@ public class LoginController {
                 Map<String,Object> map = new HashMap<>(2);
                 map.put(GatewayConsistent.USER_ID,login.getUserId().toString());
                 map.put(GatewayConsistent.USER_EMAIL, login.getEmail());
+                map.put( GatewayConsistent.USER_NAME, login.getUsername());
                 //存入jwt
                 String token = jwtTokenUtil.generateToken(new DefaultClaims(map));
                 response.setHeader(TOKEN_HEADER, token);

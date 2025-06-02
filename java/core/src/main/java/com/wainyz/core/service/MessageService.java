@@ -101,7 +101,7 @@ public class MessageService {
         redisOps.delete(endTimeKey);
         redisOps.delete(messageKey);
     }
-    public void sendClassMessage(Long userId, Long classId,String className, String content) throws Exception {
+    public void sendClassMessage(Long userId, Long classId,String senderName, String content) throws Exception {
         String key = RedisOps.RedisKeyPrefix.Class_Message.prefix +"message:"+ classId;
         String startTimeKey = key+":starttime" ;
         String endTimeKey = key+":endtime";
@@ -118,18 +118,17 @@ public class MessageService {
             }
         }
         //组装content
-        content = RedisOps.buildClassMessageContent(userId, content);
+        content = RedisOps.buildClassMessageContent(userId,senderName,content);
         redisOps.set(endTimeKey, String.valueOf(System.currentTimeMillis()));
         // 首先 先存放在redis中。具体的格式如下:
         redisOps.safeAppendToList(messageKey, List.of(content));
         Notice notice = new Notice();
-        notice.setId( IdUtil.getSnowflakeNextId());
+        notice.setId(IdUtil.getSnowflakeNextId());
         notice.setTypeByEnum(NoticeTypeEnum. ClassMessage);
         notice.setContent(content);
         notice.setTimestamp(new Date());
         notice.setUserid(userId);
         webSocketMessageService.sendMessageToClass(notice, classId);
-        //检查endtime
     }
     public List<ClassMessage> listClassMessage(Long classId){
         List<ClassMessage> list = classMessageService.lambdaQuery().eq(ClassMessage::getClassId, classId).list();

@@ -54,6 +54,6 @@ public class WebSocketMessageService {
         messagingTemplate.convertAndSend("/user/"+notice.getUserid()+"/message", notice);
     }
     public void  sendMessageToClass(Notice notice,  Long classId){
-        messagingTemplate.convertAndSend("/class/"+classId+"/message", notice);
+        messagingTemplate.convertAndSend("/user/class/"+classId+"/message", notice);
     }
 }

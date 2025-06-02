@@ -53,6 +53,13 @@ public class NoticeController {
     @GetMapping("/get/last_read_time")
     public ReturnModel getLastReadTime(@RequestAttribute(GatewayConsistent.USER_ID) Long userId){
         LastRead byId = lastReadService.getById(userId);
+        if(byId == null){
+            LastRead lastRead = new LastRead();
+            lastRead.setId(userId);
+            lastRead.setTimestamp(new Date());
+            lastReadService.save(lastRead);
+            return ReturnModel.success().setData(lastRead.getTimestamp());
+        }
         return ReturnModel.success().setData(byId.getTimestamp());
     }
     @PostMapping("/update/last_read_time")

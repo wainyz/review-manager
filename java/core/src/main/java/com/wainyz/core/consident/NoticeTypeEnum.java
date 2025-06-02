@@ -26,7 +26,7 @@ public enum NoticeTypeEnum {
     KICK_OUT_CLASS(10, "applyUserId","applyGoalClassId"),
     CLASS_UPDATE(11, "classId","tipInfo"),
     ClassMessage(30,"classId","className","senderId","content"),
-    FriendMessage(61,null),
+    FriendMessage(61,"senderId"),
     SYSTEM_ONE(-1, null);
     @JsonProperty
     public final int value;

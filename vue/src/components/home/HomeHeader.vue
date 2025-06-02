@@ -477,7 +477,7 @@ function addMessages(message) {
 }
 
 // 订阅全局通知
-webSocketService.subscribeToGlobalNotifications((message) => {
+let globalNotificationSubscription = webSocketService.subscribeToGlobalNotifications((message) => {
   const data = JSON.parse(message.body);
   console.log('收到全局通知:', data);
   handleStompMessage(message);
@@ -485,7 +485,7 @@ webSocketService.subscribeToGlobalNotifications((message) => {
 });
 
 // 订阅用户通知
-webSocketService.subscribeToUserNotifications((message) => {
+let userNotificationSubscription = webSocketService.subscribeToUserNotifications((message) => {
   const data = JSON.parse(message.body);
   console.log('收到用户通知:', data);
   handleStompMessage(message);
@@ -695,8 +695,8 @@ onUnmounted(() => {
   }
   
   // // 取消 WebSocket 订阅
-  // webSocketService.unsubscribe()
-  // webSocketService.unsubscribe()
+   webSocketService.unsubscribe(globalNotificationSubscription)
+   webSocketService.unsubscribe(userNotificationSubscription)
   
   // 清理消息状态
   messages.value = []
@@ -760,16 +760,21 @@ const fetchClasses = async () => {
   try {
     // 调用API获取班级列表
     const response = await instance.get('/class/my_classes')
-    if (response.data.code === 200) {
+    if (response.data.code === 200 && response.data.data) {
+      // 确保data是数组
+      const classData = Array.isArray(response.data.data) ? response.data.data : []
+      if(response.data.data == null){
+        return;
+      }
       // 直接使用返回的数据数组
-      classes.value = response.data.data.map(item => {
+      classes.value = classData.map(item => {
         // 解析班级信息
         const classInfo = {
           id: parseInt(item.id),
           name: item.class_name,
           description: item.description,
           // 判断当前用户是否为班级拥有者
-          isOwner: item.owner === 1,
+          isOwner: item.owner === parseInt(localStorage.getItem('userId')),
           teacherList: JSON.parse(item.teacher_list || '[]'),
           studentList: JSON.parse(item.student_list || '[]'), 
           examList: JSON.parse(item.exam_list || '[]'),
@@ -789,11 +794,13 @@ const fetchClasses = async () => {
         return classInfo
       })
     } else {
-      ElMessage.error(response.data.message || '获取班级列表失败')
+      classes.value = []
+      // ElMessage.error(response.data.message || '获取班级列表失败')
     }
   } catch (error) {
-    console.error('获取班级列表失败:', error)
-    ElMessage.error('获取班级列表失败，请稍后重试')
+    // console.error('获取班级列表失败:', error)
+    classes.value = []
+    // ElMessage.error('获取班级列表失败，请稍后重试')
   }
 }
 import { ElMessageBox } from 'element-plus'

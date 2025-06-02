@@ -224,9 +224,17 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, Class>
         if (list.isEmpty()){
             return false;
         }
-        Class aClass = (Class) list.get(0);
-        return aClass.getOwner().equals(userId) || !aClass.getTeacherList().contains(userId.toString())
-        || !aClass.getStudentList().contains(userId.toString());
+        Class aClass = list.get(0);
+            if(aClass.getOwner().equals(userId)){
+                return true;
+            }
+            if (aClass.getStudentList()!=null && aClass.getStudentList().contains(userId.toString())){
+                return true;
+            }
+            if (aClass.getTeacherList()!=null && aClass.getTeacherList().contains(userId.toString())){
+                return true;
+            }
+            return false;
     }
 
     @Override

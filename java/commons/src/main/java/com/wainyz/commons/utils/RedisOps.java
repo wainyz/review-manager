@@ -77,9 +77,9 @@ public class RedisOps {
         // 格式化为 direct:type:content，确保内容中的冒号被转义（可选）
         return String.format("%d:%d:%s", direct, type, content.replace(":", "\\:"));
     }
-    public static String buildClassMessageContent(Long senderId, String content) {
+    public static String buildClassMessageContent(Long senderId, String name, String content) {
         // 格式化为 direct:type:content，确保内容中的冒号被转义（可选）
-        return String.format("%d:%s", senderId, content.replace(":", "\\:"));
+        return String.format("%d:%s:%s", senderId, name, content.replace(":", "\\:"));
     }
     // --------------------- List 顺序存储增强方法 ---------------------
 
