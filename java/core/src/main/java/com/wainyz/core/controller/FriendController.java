@@ -91,6 +91,14 @@ public class FriendController {
             return ReturnModel.fail();
         }
     }
+    @GetMapping("/apply/reject/{friendId}")
+    public ReturnModel applyRejectFriend(@PathVariable("friendId")Long friendId,
+                                        @RequestAttribute(GatewayConsistent.USER_ID) Long userId,
+                                        @RequestAttribute(GatewayConsistent.USER_NAME) String username    ){
+        // 发送通知(校验步骤包含在这里面，所以将保存到数据库的操作放在后面)
+        noticeService.rejectFriendApplyNotice(userId,username,friendId);
+        return  ReturnModel.success().setMessage("好友拒绝成功。");
+    }
     @GetMapping("/list")
     public ReturnModel getUserAllFriends(@RequestAttribute(GatewayConsistent.USER_ID) Long userId){
         List<Friends> list = friendsService.lambdaQuery().eq(Friends::getSmallid, userId).or().eq(Friends::getBigid, userId).list();

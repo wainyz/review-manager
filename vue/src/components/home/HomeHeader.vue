@@ -551,6 +551,7 @@ function addMessages(message) {
   const data = JSON.parse(message.body)
   // 1 根据不同的notice类型，渲染不同的内容
   const newMessage = {
+    raw: data.content,
     id: data.id,
     title: '',
     type: data.type,
@@ -671,6 +672,7 @@ const fetchMessages = async () => {
     
     // 转换API返回数据为前端需要的格式
     messages.value = response.data.data.map(item => ({
+      raw: item.content,
       id: item.id,
       title: getNoticeTitle(item.type), // 根据type生成标题
       type: item.type,
@@ -761,7 +763,7 @@ const markAllAsRead = async () => {
     // 这里应该调用实际的API标记所有消息已读
     // 目前直接修改本地数据
     messages.value.forEach(msg => {
-      if(msg.type === 3 || msg.type === 4 || msg.type === 5) msg.read = false
+      if(msg.type === 3 || msg.type === 4 ) msg.read = false
       else msg.read = true
     })
     unreadCount.value = 0;

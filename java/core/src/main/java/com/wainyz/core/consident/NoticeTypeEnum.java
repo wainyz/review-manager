@@ -41,7 +41,7 @@ public enum NoticeTypeEnum {
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < otherInfo.length; i++) {
             //builder.append(otherInfo[i]).append(linkChar).append(params[i]).append(splitChar);
-            builder.append(params).append(splitChar);
+            builder.append(params[i]).append(splitChar);
         }
         builder.delete(builder.length()-1,builder.length());
         return builder.toString();

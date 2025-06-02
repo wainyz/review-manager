@@ -78,7 +78,6 @@ public class NoticeServiceImpl extends ServiceImpl<NoticeMapper, Notice>
         notice.setUserid(String.valueOf(friendId));
         notice.setContent(NoticeTypeEnum.AGREE_FRIEND_APPLY.stringify(friendId.toString(), username));
         return saveAndNoticeUser(notice);
-        // 保存好友到数据库的操作放在friendService中
     }
 
     @Override
@@ -90,6 +89,31 @@ public class NoticeServiceImpl extends ServiceImpl<NoticeMapper, Notice>
         }else{
             return false;
         }
+    }
+
+    @Override
+    public void rejectFriendApplyNotice(Long userId, String username, Long friendId) {
+        //检查 是否有申请通知
+        Notice one = null;
+        try {
+            one = lambdaQuery()
+                    .eq(Notice::getType, NoticeTypeEnum.ADD_FRIEND_APPLY.value)
+                    .eq(Notice::getUserid, userId)
+                    .like(Notice::getContent, friendId + ",%").list().get(0);
+        }catch (Exception ignored){}
+        if( one == null){
+            return;
+        }
+        //删除 通知
+        removeById(one);
+        //新建 通过申请的通知
+        Notice notice = new Notice();
+        notice.setId(String.valueOf(IdUtil.getSnowflake().nextId()));
+        notice.setTimestamp(new Date());
+        notice.setTypeByEnum(NoticeTypeEnum.REJECT_FRIEND_APPLY);
+        notice.setUserid(String.valueOf(friendId));
+        notice.setContent(NoticeTypeEnum.REJECT_FRIEND_APPLY.stringify(friendId.toString(), username));
+        saveAndNoticeUser(notice);
     }
 
 

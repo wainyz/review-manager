@@ -270,30 +270,24 @@ const formatTime = (timestamp) => {
          date.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
 }
 
-const acceptFriendRequest = async (message) => {
+const acceptFriendRequest = (message) => {
   // applyUserId=1,applyGoalUserId=3,
-  let applyUserId = getParamValue(message.content,"applyUserId")
+  console.log("message.raw",message.raw)
+  let applyUserId = message.raw.split(",")[0]
   // 处理接受好友请求的逻辑
   console.log('Accept friend request:', message)
-  const response = await instance.get(`/friends/apply/agree/${applyUserId}`)
+  const response = instance.get(`/friends/apply/agree/${applyUserId}`)
   console.log("好友处理",response)
 }
 const rejectFriendRequest = async (message) => {
   // applyUserId=1,applyGoalUserId=3,
-  let applyUserId = getParamValue(message.content,"applyUserId")
+  let applyUserId = message.raw.split(",")[0]
   // 处理接受好友请求的逻辑
   console.log('Accept friend request:', message)
   const response = await instance.get(`/friends/apply/reject/${applyUserId}`)
   console.log("好友处理",response)
-}
-function getParamValue(str, paramName) {
-  const parts = str.split(',');
-  for (let part of parts) {
-    if (part.startsWith(paramName + '=')) {
-      return part.split('=')[1];
-    }
-  }
-  return null; // 没有找到返回 null
+  messages.value = messages.value.filter(message1 => message1.id !== message.id)
+  closeDetail()
 }
 
 </script>
