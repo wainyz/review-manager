@@ -839,7 +839,7 @@ const showPaperDetail = (paperId) => {
   const paper = papers.value.find(p => p.id === paperId)
   if (paper) {
     ElMessageBox.alert(renderExamToHTML(paper.content), paper.name, {
-      confirmButtonText: '确定',
+      confirmButtonText: '导出为word',
       width: '80%',
       customClass: 'large-message-box',
       dangerouslyHtml: true,
@@ -848,9 +848,9 @@ const showPaperDetail = (paperId) => {
       dangerouslyUseHTMLString: true,
       // 添加自定义按钮
       showCancelButton: true,
-      cancelButtonText: '导出为Word',
+      cancelButtonText: '退出',
       beforeClose: (action, instance, done) => {
-        if (action === 'cancel') {
+        if (action !== 'cancel') {
           exportToWord(paper)
           done()
         } else {
