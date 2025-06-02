@@ -74,5 +74,18 @@ public class PaperController {
         List<Paper> list = paperService.lambdaQuery().eq(Paper::getUserId, userId).list();
         return ReturnModel.success().setData(list);
     }
-    
+    @PostMapping("/update")
+    public ReturnModel generationPaper(
+            @RequestAttribute(GatewayConsistent.USER_ID) String userId,
+            @RequestParam("paperId") String paperId,
+             @RequestParam("title" ) String title,
+            @RequestParam("content") String content
+    ) {
+        // 生成提示词
+        paperService.lambdaUpdate().set(Paper::getContent, content)
+                .set(Paper::getTitle, title )
+                .eq( Paper::getId, paperId)
+                .eq( Paper::getUserId, userId);
+        return ReturnModel.success();
+    }
 }

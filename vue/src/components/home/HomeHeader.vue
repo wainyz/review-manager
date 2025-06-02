@@ -183,13 +183,22 @@
                 <div class="paper-info">
                   <div class="paper-name">{{ paper.name }}</div>
                 </div>
-                <el-button 
-                  type="primary" 
-                  size="small" 
-                  @click="showPaperDetail(paper.id)"
-                >
-                  查看
-                </el-button>
+                <div class="paper-actions">
+                  <el-button 
+                    type="primary" 
+                    size="small" 
+                    @click="showPaperDetail(paper.id)"
+                  >
+                    查看
+                  </el-button>
+                  <el-button 
+                    type="warning" 
+                    size="small" 
+                    @click="handleEditPaper(paper)"
+                  >
+                    编辑
+                  </el-button>
+                </div>
               </div>
             </div>
             <div v-else class="empty-list">
@@ -310,43 +319,121 @@
     </div>
   </el-dialog>
 
-  <!-- 创建班级对话框 -->
+  <!-- 修改编辑试卷对话框 -->
   <el-dialog
-    v-model="showCreateClassDialog"
-    title="创建班级"
-    width="30%"
+    v-model="showEditPaperDialog"
+    title="编辑试卷"
+    width="80%"
     :close-on-click-modal="false"
+    class="edit-paper-dialog"
   >
     <el-form
-      ref="createClassFormRef"
-      :model="createClassForm"
-      :rules="createClassRules"
+      ref="editPaperFormRef"
+      :model="editPaperForm"
+      :rules="editPaperRules"
       label-width="100px"
-      class="create-class-form"
     >
-      <el-form-item label="班级名称" prop="className">
-        <el-input v-model="createClassForm.className" placeholder="请输入班级名称" />
+      <el-form-item label="试卷名称" prop="title">
+        <el-input v-model="editPaperForm.title" placeholder="请输入试卷名称" />
       </el-form-item>
-      <el-form-item label="班级描述" prop="description">
-        <el-input
-          v-model="createClassForm.description"
-          type="textarea"
-          :rows="3"
-          placeholder="请输入班级描述"
-        />
-      </el-form-item>
-      <el-form-item label="班级类型" prop="type">
-        <el-select v-model="createClassForm.isPublic" placeholder="请选择班级类型">
-          <el-option label="公开班级" value="1" />
-          <el-option label="私有班级" value="0" />
-        </el-select>
+      
+      <el-form-item label="试卷内容">
+        <div class="paper-editor">
+          <div class="editor-section">
+            <h3>试卷描述</h3>
+            <el-input
+              v-model="editPaperForm.description"
+              type="textarea"
+              :rows="3"
+              placeholder="请输入试卷描述"
+            />
+          </div>
+
+          <div v-for="(block, blockIndex) in editPaperForm.questionBlocks" :key="blockIndex" class="question-block">
+            <div class="block-header">
+              <h3>题目组 {{ blockIndex + 1 }}</h3>
+              <el-button type="danger" size="small" @click="removeQuestionBlock(blockIndex)">删除题目组</el-button>
+            </div>
+            
+            <el-form-item label="题目组标题">
+              <el-input v-model="block.questionsTitle" placeholder="请输入题目组标题" />
+            </el-form-item>
+            
+            <el-form-item label="题目类型">
+              <el-select v-model="block.questionType" placeholder="请选择题目类型">
+                <el-option label="选择题" :value="1" />
+                <el-option label="填空题" :value="2" />
+                <el-option label="简答题" :value="3" />
+              </el-select>
+            </el-form-item>
+
+            <div v-for="(question, qIndex) in block.questions" :key="qIndex" class="question-item">
+              <div class="question-header">
+                <h4>题目 {{ qIndex + 1 }}</h4>
+                <el-button type="danger" size="small" @click="removeQuestion(blockIndex, qIndex)">删除题目</el-button>
+              </div>
+
+              <el-form-item label="题目内容">
+                <el-input
+                  v-model="question.question"
+                  type="textarea"
+                  :rows="2"
+                  placeholder="请输入题目内容"
+                />
+              </el-form-item>
+
+              <template v-if="block.questionType === 1">
+                <el-form-item label="选项A">
+                  <el-input v-model="question.chooseA" placeholder="请输入选项A" />
+                </el-form-item>
+                <el-form-item label="选项B">
+                  <el-input v-model="question.chooseB" placeholder="请输入选项B" />
+                </el-form-item>
+                <el-form-item label="选项C">
+                  <el-input v-model="question.chooseC" placeholder="请输入选项C" />
+                </el-form-item>
+                <el-form-item label="选项D">
+                  <el-input v-model="question.chooseD" placeholder="请输入选项D" />
+                </el-form-item>
+                <el-form-item label="正确答案">
+                  <el-select v-model="question.rightChoose" placeholder="请选择正确答案">
+                    <el-option label="A" value="A" />
+                    <el-option label="B" value="B" />
+                    <el-option label="C" value="C" />
+                    <el-option label="D" value="D" />
+                  </el-select>
+                </el-form-item>
+              </template>
+
+              <template v-else>
+                <el-form-item label="参考答案">
+                  <el-input
+                    v-model="question.rightAnswer"
+                    type="textarea"
+                    :rows="2"
+                    placeholder="请输入参考答案"
+                  />
+                </el-form-item>
+              </template>
+            </div>
+
+            <el-button type="primary" @click="addQuestion(blockIndex)" class="add-question-btn">
+              添加题目
+            </el-button>
+          </div>
+
+          <el-button type="primary" @click="addQuestionBlock" class="add-block-btn">
+            添加题目组
+          </el-button>
+        </div>
       </el-form-item>
     </el-form>
+
     <template #footer>
       <span class="dialog-footer">
-        <el-button @click="showCreateClassDialog = false">取消</el-button>
-        <el-button type="primary" @click="submitCreateClass" :loading="isCreating">
-          创建
+        <el-button @click="showEditPaperDialog = false">取消</el-button>
+        <el-button type="primary" @click="submitEditPaper" :loading="isEditing">
+          保存
         </el-button>
       </span>
     </template>
@@ -1234,6 +1321,121 @@ function enterClassChat(id,name){
     window.location.reload()
   })
 }
+
+// 在 script setup 中修改相关状态和方法
+const showEditPaperDialog = ref(false)
+const editPaperFormRef = ref(null)
+const isEditing = ref(false)
+const currentPaperId = ref(null)
+
+const editPaperForm = ref({
+  title: '',
+  description: '',
+  questionBlocks: []
+})
+
+const editPaperRules = {
+  title: [
+    { required: true, message: '请输入试卷名称', trigger: 'blur' },
+    { min: 2, max: 50, message: '长度在 2 到 50 个字符', trigger: 'blur' }
+  ],
+  description: [
+    { required: true, message: '请输入试卷描述', trigger: 'blur' },
+    { min: 5, max: 200, message: '长度在 5 到 200 个字符', trigger: 'blur' }
+  ]
+}
+
+// 处理编辑试卷
+const handleEditPaper = (paper) => {
+  currentPaperId.value = paper.id
+  try {
+    const paperContent = typeof paper.content === 'string' ? JSON.parse(paper.content) : paper.content
+    editPaperForm.value = {
+      title: paper.name,
+      description: paperContent.description || '',
+      questionBlocks: paperContent.questionBlocks || []
+    }
+    showEditPaperDialog.value = true
+  } catch (error) {
+    console.error('解析试卷内容失败:', error)
+    ElMessage.error('试卷格式错误，无法编辑')
+  }
+}
+
+// 添加题目组
+const addQuestionBlock = () => {
+  editPaperForm.value.questionBlocks.push({
+    questionsTitle: '',
+    questionType: 1,
+    questions: []
+  })
+}
+
+// 删除题目组
+const removeQuestionBlock = (blockIndex) => {
+  editPaperForm.value.questionBlocks.splice(blockIndex, 1)
+}
+
+// 添加题目
+const addQuestion = (blockIndex) => {
+  const block = editPaperForm.value.questionBlocks[blockIndex]
+  block.questions.push({
+    question: '',
+    rightChoose: '',
+    rightAnswer: '',
+    chooseA: '',
+    chooseB: '',
+    chooseC: '',
+    chooseD: ''
+  })
+}
+
+// 删除题目
+const removeQuestion = (blockIndex, questionIndex) => {
+  editPaperForm.value.questionBlocks[blockIndex].questions.splice(questionIndex, 1)
+}
+
+// 提交编辑试卷
+const submitEditPaper = async () => {
+  if (!editPaperFormRef.value) return
+  
+  try {
+    await editPaperFormRef.value.validate()
+    isEditing.value = true
+    
+    // 构建试卷内容
+    const paperContent = {
+      description: editPaperForm.value.description,
+      questionBlocks: editPaperForm.value.questionBlocks
+    }
+    
+    // 创建FormData对象并添加数据
+    const formData = new FormData()
+    formData.append('paperId', currentPaperId.value)
+    formData.append('title', editPaperForm.value.title)
+    formData.append('content', JSON.stringify(paperContent))
+    
+    const response = await instance.post('/paper/update', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+    
+    if (response.data.code === 200) {
+      ElMessage.success('试卷更新成功')
+      showEditPaperDialog.value = false
+      // 刷新试卷列表
+      fetchPapers()
+    } else {
+      ElMessage.error(response.data.message || '更新试卷失败')
+    }
+  } catch (error) {
+    console.error('更新试卷失败:', error)
+    ElMessage.error('更新试卷失败，请稍后重试')
+  } finally {
+    isEditing.value = false
+  }
+}
 </script>
 
 <style scoped>
@@ -1478,5 +1680,62 @@ function enterClassChat(id,name){
   display: flex;
   justify-content: flex-end;
   gap: 12px;
+}
+
+.paper-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* 修改编辑试卷对话框样式 */
+.edit-paper-dialog {
+  .paper-editor {
+    padding: 20px;
+    background-color: var(--el-bg-color);
+    border-radius: 4px;
+    width: 1392px;
+  }
+
+  .editor-section {
+    margin-bottom: 20px;
+  }
+
+  .question-block {
+    margin: 20px 0;
+    padding: 20px;
+    border: 1px solid var(--el-border-color-light);
+    border-radius: 4px;
+    background-color: var(--el-bg-color-overlay);
+  }
+
+  .block-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .question-item {
+    margin: 20px 0;
+    padding: 20px;
+    border: 1px solid var(--el-border-color-lighter);
+    border-radius: 4px;
+    background-color: var(--el-bg-color);
+  }
+
+  .question-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+
+  .add-question-btn {
+    margin-top: 10px;
+  }
+
+  .add-block-btn {
+    margin-top: 20px;
+  }
 }
 </style>
