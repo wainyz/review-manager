@@ -278,7 +278,8 @@ onMounted(() => {
   getChatHistory()
   
   // 订阅WebSocket消息
-  webSocketService.subscribeToUserNotifications((message) => {
+  const userId = localStorage.getItem('userId');
+  webSocketService.subscribeAnyChannel(`/user/friends/${userId}/message`,(message) => {
     const data = JSON.parse(message.body)
     console.log('收到聊天消息:', data)
     // 处理接收到的聊天消息

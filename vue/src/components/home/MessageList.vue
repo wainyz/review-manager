@@ -78,6 +78,7 @@
 <script setup>
 import { defineProps, defineEmits, computed, ref, onMounted, watch } from 'vue'
 import instance from '../../config/axios'
+import { ElMessage } from 'element-plus'
 
 const props = defineProps({
   messages: {
@@ -270,14 +271,16 @@ const formatTime = (timestamp) => {
          date.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
 }
 
-const acceptFriendRequest = (message) => {
+const acceptFriendRequest = async (message) => {
   // applyUserId=1,applyGoalUserId=3,
   console.log("message.raw",message.raw)
   let applyUserId = message.raw.split(",")[0]
   // 处理接受好友请求的逻辑
   console.log('Accept friend request:', message)
   const response = instance.get(`/friends/apply/agree/${applyUserId}`)
+  ElMessage(response.data.data.message)
   console.log("好友处理",response)
+  closeDetail()
 }
 const rejectFriendRequest = async (message) => {
   // applyUserId=1,applyGoalUserId=3,
@@ -286,7 +289,7 @@ const rejectFriendRequest = async (message) => {
   console.log('Accept friend request:', message)
   const response = await instance.get(`/friends/apply/reject/${applyUserId}`)
   console.log("好友处理",response)
-  messages.value = messages.value.filter(message1 => message1.id !== message.id)
+  ElMessage(response.data.data.message)
   closeDetail()
 }
 

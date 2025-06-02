@@ -125,12 +125,12 @@ class WebSocketService {
   // 订阅用户个人通知
   subscribeToUserNotifications(callback) {
     const userId = localStorage.getItem('userId');
-    const subscriptionId = `user-${userId}-${Date.now()}`;
+    const subscriptionId = `/user/${userId}/message`;
 
     if (!this.userSubscriptions.has(subscriptionId)) {
       this.connect().then(() => {
         const subscription = this.stompClient.subscribe(
-          `/user/${userId}/notice`,
+          subscriptionId,
           (message) => {
             if (!this.receivedMessages.has(message.body)) {
               this.receivedMessages.add(message.body);
@@ -152,12 +152,12 @@ class WebSocketService {
   }
   subscribeToUserMessage(callback) {
     const userId = localStorage.getItem('userId');
-    const subscriptionId = `message-${userId}-${Date.now()}`;
+    const subscriptionId = `/user/${userId}/message`;
 
     if (!this.userSubscriptions.has(subscriptionId)) {
       this.connect().then(() => {
         const subscription = this.stompClient.subscribe(
-          `/user/${userId}/message`,
+          subscriptionId,
           (message) => {
             if (!this.receivedMessages.has(message.body)) {
               this.receivedMessages.add(message.body);
@@ -178,12 +178,12 @@ class WebSocketService {
     return subscriptionId;
   }
   subscribeAnyChannel(channel,callback) {
-    const subscriptionId = `channel-${channel}-${Date.now()}`;
+    const subscriptionId = channel;
 
     if (!this.userSubscriptions.has(subscriptionId)) {
       this.connect().then(() => {
         const subscription = this.stompClient.subscribe(
-          `${channel}`,
+          channel,
           (message) => {
             if (!this.receivedMessages.has(message.body)) {
               this.receivedMessages.add(message.body);
@@ -204,12 +204,12 @@ class WebSocketService {
   }
   subscribeToClassMessage(classId,callback) {
     const userId = localStorage.getItem('classId');
-    const subscriptionId = `class-message-${classId}-${Date.now()}`;
+    const subscriptionId =  `/user/class/${userId}/message`;
 
     if (!this.userSubscriptions.has(subscriptionId)) {
       this.connect().then(() => {
         const subscription = this.stompClient.subscribe(
-          `/class/${userId}/message`,
+          subscriptionId,
           (message) => {
             if (!this.receivedMessages.has(message.body)) {
               this.receivedMessages.add(message.body);

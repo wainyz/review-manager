@@ -81,7 +81,7 @@ public class MessageController {
         notice.setContent(content);
         notice.setTimestamp(new Date());
         notice.setUserid(String.valueOf(friendId));
-        webSocketMessageService.sendMessageToUser(notice);
+        webSocketMessageService.sendChatMessageToUser(notice);
 
         return ReturnModel.success();
     }
