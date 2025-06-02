@@ -8,6 +8,8 @@ import com.wainyz.user.pojo.domin.UserRegistryDO;
 import com.wainyz.user.pojo.po.UserPO;
 import com.wainyz.user.service.RegisterService;
 import com.wainyz.user.service.UserService;
+import com.wainyz.user.utils.MyBCryptPasswordEncoder;
+import com.wainyz.user.utils.UsernameGenerator;
 import com.wainyz.user.validate.LoginCheck;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,6 +23,10 @@ import java.util.concurrent.TimeUnit;
  */
 @Service
 public class RegisterServiceImpl implements RegisterService {
+    @Autowired
+    private UsernameGenerator usernameGenerator;
+    @Autowired
+    private MyBCryptPasswordEncoder encoder;
     @Value("${user.register.email_code.timeout:60}")
     private int timeout;
     @Autowired
@@ -76,7 +82,9 @@ public class RegisterServiceImpl implements RegisterService {
 
         // 调用用户服务进行注册操作，并根据结果返回成功或失败信息
         try {
-            UserPO userPO = new UserPO().setEmail(model.getEmail()).setPassword(model.getPassword());
+            // 调用bcrypt生成加盐密码
+            String password = encoder.encode(model.getPassword());
+            UserPO userPO = new UserPO().setEmail(model.getEmail()).setPassword(password).setUsername(usernameGenerator.generateUsername(model.getEmail(),model.getEmailCode()));
             if (userService.register(userPO) != null) {
                 redisOps.delete(RedisOps.RedisKeyPrefix.Register_Email,model.getEmail());
                 return ReturnModel.success().setMessage("注册成功");

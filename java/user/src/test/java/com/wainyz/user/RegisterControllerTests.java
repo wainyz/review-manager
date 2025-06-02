@@ -6,7 +6,6 @@ import com.wainyz.user.controller.RegisterController;
 import com.wainyz.user.exception.CheckException;
 import com.wainyz.user.pojo.domin.UserRegistryDO;
 import com.wainyz.user.pojo.po.SendEmailRequestData;
-import com.wainyz.user.pojo.po.UserPO;
 import com.wainyz.user.service.UserService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.Test;
@@ -15,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.ActiveProfiles;
+
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -36,6 +36,7 @@ public class RegisterControllerTests {
     public void testSendEmail() {
         SendEmailRequestData sendEmailRequestData = new SendEmailRequestData();
         // 已存在的邮箱
+        logger.info("[system] 开始测试：存在邮箱异常触发。");
         sendEmailRequestData.email = "player_simple@163.com";
         sendEmailRequestData.setImageCode("1f68");
         sendEmailRequestData.setImageId("185033");
@@ -50,6 +51,7 @@ public class RegisterControllerTests {
             redisOps.delete(RedisOps.RedisKeyPrefix.Register_Email,sendEmailRequestData.getEmail());
         }
         // 正常发送邮件数据
+        logger.info("[system]开始测试: 未注册的正常邮箱流程。");
         sendEmailRequestData.setEmail("3175535553@qq.com");
         try {
             ReturnModel returnModel = registerController.sendEmail(sendEmailRequestData);
@@ -78,6 +80,7 @@ public class RegisterControllerTests {
     public void testRegister(){
         UserRegistryDO userRegistryDO = new UserRegistryDO();
         // 没有发送邮箱验证码，或者验证码已经过期的情况
+        logger.info("[system]开始测试：邮箱验证码校验异常触发。");
         userRegistryDO.setEmail("3175535553@qq.com");
         userRegistryDO.setEmailCode("123456");
         try {
@@ -114,6 +117,7 @@ public class RegisterControllerTests {
 
         // 重新设置了密码，并改成了已经注册的邮箱账户。此时应该触发用户已注册（必须保证测试邮箱注册过)
         try {
+            logger.info("[system]开始测试: 邮箱已经注册");
             userRegistryDO.setPassword("1234512312316");
             userRegistryDO.setEmail("player_simple@163.com");
             redisOps.setAndExpire(RedisOps.RedisKeyPrefix.Register_Email,userRegistryDO.getEmail(),"123456",60,TimeUnit.SECONDS);
@@ -132,6 +136,7 @@ public class RegisterControllerTests {
 
         //最后注册成功的测试
         try {
+            logger.info("[system]开始测试：邮箱正常注册成功。");
             userRegistryDO.setEmail("3175535553@163.com");
             userRegistryDO.setPassword("1234512312316");
             userService.deleteUser(userRegistryDO.getEmail());

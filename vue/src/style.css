@@ -78,9 +78,10 @@ button:focus-visible {
 
 #app {
   /* max-width: 1280px; */
-  margin: auto;
+  margin: 0;
   padding: 0;
   text-align: left;
+  width: 100%;
 }
 
 .el-drawer {
@@ -95,4 +96,138 @@ button:focus-visible {
   background-color: var(--card-bg) !important;
   border-color: var(--border-color) !important;
   color: var(--text-color) !important;
+}
+/* 在全局样式中添加 */
+.critical-message {
+  min-width: 400px !important;
+  background-color: #fff8e6 !important;
+  border-left: 4px solid #ffc53d;
+}
+
+.progress-message {
+  .el-progress__text {
+    font-size: 12px;
+  }
+}
+/* 消息通知靠右显示 */
+.el-message {
+  top: 20px !important;
+  right: 20px !important;
+  left: auto !important;
+  min-width: 300px;
+  z-index: 9999 !important; /* 确保在Header之上 */
+
+  /* 不同类型消息的右侧边框强调 */
+  &--info {
+    border-left: 4px solid var(--el-color-info);
+  }
+  &--success {
+    border-left: 4px solid var(--el-color-success);
+  }
+  &--warning {
+    border-left: 4px solid var(--el-color-warning);
+  }
+}
+
+/* 进度条消息特殊样式 */
+.progress-message {
+  right: 30px !important;
+  top: 30px !important;
+  
+  .el-progress__text {
+    font-size: 12px;
+    color: var(--el-text-color-regular);
+  }
+}
+.el-message-box {
+  max-width: none;
+}
+
+/* 定义 large-message-box 类 */
+.large-message-box .el-message-box__wrapper {
+  width: 80% !important; /* 确保宽度占屏幕的80% */
+  max-width: 800px !important; /* 可选：设置最大宽度 */
+}
+
+.large-message-box .el-message-box {
+  height: 80vh !important; /* 设置高度占视口的80% */
+  max-height: 600px !important; /* 可选：设置最大高度 */
+  border-radius: 12px !important; /* 圆角边框 */
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important; /* 阴影效果 */
+  background-color: #fff !important; /* 背景颜色 */
+}
+
+/* 调整消息框的内容区域 */
+.large-message-box .el-message-box__content {
+  padding: 40px !important; /* 增加内边距 */
+  overflow-y: auto !important; /* 允许滚动 */
+  max-height: calc(80vh - 180px) !important; /* 计算内容区域的最大高度 */
+  font-family: Arial, sans-serif !important; /* 字体 */
+  color: #333 !important; /* 文字颜色 */
+}
+
+/* 调整消息框的标题区域 */
+.large-message-box .el-message-box__header {
+  padding: 30px !important; /* 增加内边距 */
+  background-color: #f0f9eb !important; /* 标题背景颜色 */
+  border-top-left-radius: 12px !important; /* 左上圆角 */
+  border-top-right-radius: 12px !important; /* 右上圆角 */
+  border-bottom: 1px solid #ebeef5 !important; /* 底部边框 */
+}
+
+.large-message-box .el-message-box__title {
+  font-size: 24px !important; /* 增大标题字体大小 */
+  font-weight: bold !important; /* 标题字体粗细 */
+  color: #67c23a !important; /* 标题文字颜色 */
+}
+
+/* 调整消息框的按钮区域 */
+.large-message-box .el-message-box__btns {
+  padding: 30px !important; /* 增加内边距 */
+  background-color: #f0f9eb !important; /* 按钮背景颜色 */
+  border-bottom-left-radius: 12px !important; /* 左下圆角 */
+  border-bottom-right-radius: 12px !important; /* 右下圆角 */
+}
+
+.large-message-box .el-message-box__btns button {
+  font-size: 18px !important; /* 增大按钮字体大小 */
+  padding: 12px 24px !important; /* 增大按钮内边距 */
+  border-radius: 8px !important; /* 按钮圆角 */
+}
+
+.large-message-box .el-message-box__btns button.el-button--primary {
+  background-color: #3a6ac2 !important; /* 主按钮背景颜色 */
+  border-color: #3a53c2 !important; /* 主按钮边框颜色 */
+}
+
+.large-message-box .el-message-box__btns button.el-button--primary:hover {
+  background-color: #5daf34 !important; /* 主按钮悬停背景颜色 */
+  border-color: #5daf34 !important; /* 主按钮悬停边框颜色 */
+}
+
+/* 自定义考试题目和答案的样式 */
+.large-message-box .exam-question h3 {
+  font-size: 20px !important; /* 增大题目标题字体大小 */
+  font-weight: bold !important; /* 题目标题字体粗细 */
+  color: #333 !important; /* 题目标题文字颜色 */
+  margin-bottom: 15px !important; /* 增加题目标题底部外边距 */
+}
+
+.large-message-box .exam-question p {
+  font-size: 18px !important; /* 增大题目内容字体大小 */
+  color: #555 !important; /* 题目内容文字颜色 */
+  margin-bottom: 30px !important; /* 增加题目内容底部外边距 */
+}
+
+.large-message-box .exam-answer h4 {
+  font-size: 18px !important; /* 增大答案标题字体大小 */
+  font-weight: bold !important; /* 答案标题字体粗细 */
+  color: #45742e !important; /* 答案标题文字颜色 */
+  margin-bottom: 15px !important; /* 增加答案标题底部外边距 */
+}
+
+.large-message-box .exam-answer p {
+  font-size: 18px !important; /* 增大答案内容字体大小 */
+  color: #333 !important; /* 答案内容文字颜色 */
+  margin-bottom: 30px !important; /* 增加答案内容底部外边距 */
 }

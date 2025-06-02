@@ -5,12 +5,20 @@
 </template>
 
 <script setup>
-import { ElConfigProvider } from 'element-plus'
+
+
+
+
 </script>
 
 <style>
 @import 'element-plus/dist/index.css';
-
+@media (max-width: 768px) {
+  .el-message {
+    width: calc(100% - 40px) !important;
+    right: 20px !important;
+  }
+}
 :root {
   /* 浅色主题 */
   --bg-color: #f5f5f5;

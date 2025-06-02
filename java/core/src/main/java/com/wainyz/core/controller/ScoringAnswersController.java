@@ -7,12 +7,11 @@ import com.wainyz.core.CoreApplication;
 import com.wainyz.core.analyizer.QuestionFileAnalyzer;
 import com.wainyz.core.manager.DataFileManager;
 import com.wainyz.core.manager.PromptManager;
-import com.wainyz.core.pojo.domin.QuestionFileDO;
+import com.wainyz.core.pojo.domain.Notice;
 import com.wainyz.core.utils.MessageSender;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-;import java.io.IOException;
+import java.io.IOException;
 import java.util.Arrays;
 
 /**
@@ -41,9 +40,10 @@ public class ScoringAnswersController {
         try {
             dataFileManager.saveAnswerFile(fileId, OBJECT_MAPPER.writeValueAsString(answer));
             String[] questionAndCorrects = questionFileAnalyzer.getQuestionFileDO(dataFileManager.getCurrenQuestionContent(fileId)).justQuestionCorrectString();
-            if (messageSender.sendDeepSeekRequest(promptManager.scoringAnswerPrompt(Arrays.toString(questionAndCorrects),Arrays.toString(answer), userId, fileId))) {
+            Notice notice = messageSender.sendDeepSeekRequest(promptManager.scoringAnswerPrompt(Arrays.toString(questionAndCorrects), Arrays.toString(answer), userId, fileId));
+            if (notice  != null) {
                 // 保存answer
-                return ReturnModel.success().setMessage("提交成功");
+                return ReturnModel.success().setMessage("提交成功").setData(notice);
             } else {
                 dataFileManager.deleteAnswerFile(fileId);
                 return ReturnModel.fail().setMessage("提交失败");

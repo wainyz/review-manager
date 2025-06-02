@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.wainyz.core.CoreApplication;
-import com.wainyz.core.pojo.domin.ScoringResponse;
+import com.wainyz.core.pojo.domain.ScoringResponse;
 
 /**
  * @author Yanion_gwgzh

@@ -1,6 +1,7 @@
 package com.wainyz.core;
 
-import com.wainyz.core.pojo.domin.DeepSeekRequestDO;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.wainyz.core.pojo.domain.DeepSeekRequestDO;
 import com.wainyz.core.utils.MessageSender;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +17,7 @@ public class MqSenderTests {
     @Autowired
     private MessageSender messageSender;
     @Test
-    public void testSend() {
+    public void testSend() throws JsonProcessingException {
         assert messageSender != null;
         DeepSeekRequestDO deepSeekRequestDO = new DeepSeekRequestDO();
         deepSeekRequestDO.setFileId("1");

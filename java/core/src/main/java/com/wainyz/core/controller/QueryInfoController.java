@@ -7,7 +7,7 @@ import com.wainyz.commons.pojo.vo.ReturnModel;
 import com.wainyz.core.analyizer.ControllerFileAnalyzer;
 import com.wainyz.core.manager.DataFileManager;
 import com.wainyz.core.manager.QuickStatusManager;
-import com.wainyz.core.pojo.domin.ControllerFileDO;
+import com.wainyz.core.pojo.domain.ControllerFileDO;
 import com.wainyz.core.pojo.po.UserFilePO;
 import com.wainyz.core.pojo.vo.DocumentVo;
 import com.wainyz.core.service.UserFileService;

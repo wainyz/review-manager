@@ -13,11 +13,11 @@ export default defineConfig({
     sourcemap: true
   },
   server: {
-    proxy: {
-      '/public': {
-        target: 'http://localhost:80',
-        changeOrigin: true
-      }
-    }
+    // proxy: {
+    //   '/public': {
+    //     target: 'http://localhost:80/review',
+    //     changeOrigin: true
+    //   }
+    // }
   }
 })

@@ -63,7 +63,7 @@ import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { Message, Lock, Key } from '@element-plus/icons-vue'
 import { ElMessage, ElLoading } from 'element-plus'
-import { API_PATHS } from '../config/api'
+import { API_PATHS, getFullUrl } from '../config/api'
 import request from '../config/axios'
 
 const router = useRouter()
@@ -103,7 +103,7 @@ const rules = {
 // 定义刷新验证码的方法
 const refreshCaptcha = async () => {
   try {
-    const { data } = await (await request.post(API_PATHS.REFRESH_CAPTCHA + '?image_id=' + registerForm.image_id)).data
+    const { data } = await (await request.post(getFullUrl(API_PATHS.REFRESH_CAPTCHA) + '?image_id=' + registerForm.image_id)).data
     registerForm.image_id = data
     captchaUrl.value = `${request.defaults.baseURL}${API_PATHS.GET_CAPTCHA}/${data}`
   } catch (error) {

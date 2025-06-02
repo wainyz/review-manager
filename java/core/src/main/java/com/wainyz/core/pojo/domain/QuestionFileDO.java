@@ -1,4 +1,4 @@
-package com.wainyz.core.pojo.domin;
+package com.wainyz.core.pojo.domain;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;

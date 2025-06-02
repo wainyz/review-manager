@@ -1,8 +1,8 @@
 package com.wainyz.core.convert;
 
 import com.wainyz.core.consident.AttenuationEnum;
-import com.wainyz.core.pojo.domin.ControllerFileDO;
-import com.wainyz.core.pojo.domin.QuestionFileDO;
+import com.wainyz.core.pojo.domain.ControllerFileDO;
+import com.wainyz.core.pojo.domain.QuestionFileDO;
 
 import java.time.Instant;
 

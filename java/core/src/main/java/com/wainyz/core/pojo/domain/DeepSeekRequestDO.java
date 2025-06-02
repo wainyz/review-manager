@@ -1,11 +1,9 @@
-package com.wainyz.core.pojo.domin;
+package com.wainyz.core.pojo.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Data;
 import lombok.Getter;
-
-import java.io.Serializable;
 
 /**
  * deepseek请求参数封装
@@ -33,12 +31,14 @@ public class DeepSeekRequestDO {
      */
     @Getter
     public enum DeepSeekRequestEnum{
-        GENERATE_QUESTION(0),SCORING_ANSWERS(1);
+        GENERATE_TEST(0,"测试题生成中..."),SCORING_ANSWERS(1,"批改题目中..."), GENERATE_PAPER(3, "试卷生成中...");
         @JsonValue
         private int typeCode;
+        private String chineseName;
 
-        DeepSeekRequestEnum(int typeCode) {
+        DeepSeekRequestEnum(int typeCode, String chineseName) {
             this.typeCode = typeCode;
+            this.chineseName = chineseName;
         }
     }
 }

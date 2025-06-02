@@ -1,7 +1,7 @@
 package com.wainyz.core.manager;
 
 
-import com.wainyz.core.pojo.domin.DeepSeekRequestDO;
+import com.wainyz.core.pojo.domain.DeepSeekRequestDO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -13,6 +13,58 @@ import org.springframework.stereotype.Component;
 @Component
 public class PromptManager {
     //--------------0---------------
+    public static final String PAPER_GENERATE_PROMPT = """
+[角色设定]
+你是一个出题老师，你需要根据<考题资料>,<出题模式>,<考察范围比例>来制作考题。
+[核心任务]
+首先读取<考题资料>如果发现不存在，请使用联网功能从网络中获取相关内容作为考题资料。
+根据出题模式以及考察范围，合理安排题目的类型，考察的知识，题目的分数，以及考题整体题目的数量，确保最后试卷满分为100分。
+[具体要求]
+1. 总分必须100分，合理设置每道题的分值.
+2. 合理安排题目的类型和考察的知识，做到符合<考察范围比例>以及<出题模式>
+3. 合理寻找网络资料，保证考察内容不重复冗余，特别对于解答题，需要有完整合理的逻辑，更应该从网上搜索。
+4. 不要省略，要求完整的题目列表。
+5. 最终输出为json字符串，严格按照格式要求 输出。
+[输出格式]
+题目分为 选择题、填空题、解答题。其题目格式如下：
+选择题：
+{
+    "question": "xxx",
+    "chooseA": "A. xxx",
+    "chooseB": "B. xxx",
+    "chooseC": "C. xxx",
+    "chooseD": "D. xxx",
+    "rightChoose": "B",
+    "score": <分值>
+}
+填空题:
+{
+     "question":"xxx${blank_1}xxx${blank_1}...",
+     "rightAnswer":"${answer_1};&;${answer_2};&;...",
+     "score": <分值>
+}
+解答题:
+{
+     "question":"xxx",
+     "rightAnswer":"xxx",
+     "score": <分值>
+}
+[最终输出]要求输出json字符串格式如下
+{
+    "description":"出题考察的类型和范围描述",
+    "questionBlocks":[
+        {
+            "questionType": <选择题为1，填空题赋2，解答题赋3>,
+            "questionsTitle": "题目类型描述和解释",
+            "questions":[
+                {
+                    <根据具体题目的类型决定>
+                }, ...
+             ]
+        }, ...
+    ]
+}
+""";
     public static final String GENERATE_QUESTION_PROMPT =
 """
 [角色设定]
@@ -146,7 +198,7 @@ ${other_prompt}
         deepSeekRequestDO.setUserContent(mustHave);
         deepSeekRequestDO.setUserId(userId);
         deepSeekRequestDO.setFileId(fileId);
-        deepSeekRequestDO.setDeepSeekRequestEnum(DeepSeekRequestDO.DeepSeekRequestEnum.GENERATE_QUESTION);
+        deepSeekRequestDO.setDeepSeekRequestEnum(DeepSeekRequestDO.DeepSeekRequestEnum.GENERATE_TEST);
         return deepSeekRequestDO;
     }
 

@@ -45,7 +45,7 @@ import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { Message, Lock, Key } from '@element-plus/icons-vue'
 import { ElMessage, ElLoading } from 'element-plus'
-import { API_PATHS } from '../config/api'
+import { API_PATHS, getFullUrl } from '../config/api'
 import request from '../config/axios'
 
 const router = useRouter()
@@ -61,8 +61,8 @@ const captchaUrl = ref('')
 
 const rules = {
   email: [
-    { required: true, message: '请输入邮箱', trigger: 'blur' },
-    { type: 'email', message: '请输入正确的邮箱格式', trigger: 'blur' }
+    { required: true, message: '请输入邮箱或者用户名', trigger: 'blur' },
+    { type: 'string', message: '请输入正确的字符和长度', trigger: 'blur' }
   ],
   password: [
     { required: true, message: '请输入密码', trigger: 'blur' },
@@ -77,7 +77,7 @@ const rules = {
 // 定义刷新验证码的方法
 const refreshCaptcha = async () => {
   try {
-    const { data } = await (await request.post(API_PATHS.REFRESH_CAPTCHA + '?image_id=' + loginForm.image_id)).data
+    const { data } = await (await request.post(getFullUrl(API_PATHS.REFRESH_CAPTCHA) + '?image_id=' + loginForm.image_id)).data
     loginForm.image_id = data
     captchaUrl.value = `${request.defaults.baseURL}${API_PATHS.GET_CAPTCHA}/${data}`
   } catch (error) {
@@ -107,7 +107,7 @@ const handleLogin = async () => {
     background: 'rgba(0, 0, 0, 0.7)'
   })
   try {
-    const response = await request.post(API_PATHS.LOGIN, {
+    const response = await request.post(getFullUrl(API_PATHS.LOGIN), {
       email: loginForm.email,
       password: loginForm.password,
       image_code: loginForm.image_code,
@@ -122,6 +122,7 @@ const handleLogin = async () => {
     // 存储用户信息和token
     localStorage.setItem('token', token)
     localStorage.setItem('userInfo', JSON.stringify(data))
+    localStorage.setItem('userId', data.user_id)
     
 
     ElMessage.success('登录成功')

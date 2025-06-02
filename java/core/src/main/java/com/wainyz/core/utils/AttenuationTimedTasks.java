@@ -5,13 +5,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wainyz.core.analyizer.ControllerFileAnalyzer;
 import com.wainyz.core.consident.AttenuationEnum;
 import com.wainyz.core.manager.DataFileManager;
-import com.wainyz.core.pojo.domin.ControllerFileDO;
+import com.wainyz.core.pojo.domain.ControllerFileDO;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.text.SimpleDateFormat;

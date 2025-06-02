@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wainyz.commons.consistent.GatewayConsistent;
 import com.wainyz.commons.pojo.vo.ReturnModel;
 import com.wainyz.core.manager.PromptManager;
-import com.wainyz.core.pojo.domin.DeepSeekRequestDO;
+import com.wainyz.core.pojo.domain.DeepSeekRequestDO;
 import com.wainyz.core.service.UserFileService;
 import com.wainyz.core.utils.MessageSender;
 import org.slf4j.Logger;
@@ -89,4 +89,23 @@ public class GenerationQuestionController {
         messageSender.sendDeepSeekRequest(deepSeekRequestDO);
         return ReturnModel.success().setData("请求已提交。");
     }
+//    /**
+//     *
+//     */
+//    @PostMapping("/generationExam")
+//    public ReturnModel generationExam(
+//            @RequestAttribute(GatewayConsistent.USER_ID) String userId,
+//            @RequestBody ExamParamDO data
+//    ) throws JsonProcessingException {
+//        // 生成提示词
+//        String generateQuestionAutoPrompt = PromptManager.PAPER_GENERATE_PROMPT;
+//        DeepSeekRequestDO deepSeekRequestDO = new DeepSeekRequestDO();
+//        deepSeekRequestDO.setUserId(userId);
+//        deepSeekRequestDO.setFileId("0000");
+//        deepSeekRequestDO.setSystemPrompt(generateQuestionAutoPrompt);
+//        deepSeekRequestDO.setUserContent(data.toUserPrompt());
+//        deepSeekRequestDO.setDeepSeekRequestEnum(DeepSeekRequestDO.DeepSeekRequestEnum.GENERATE_PAPER);
+//        messageSender.sendDeepSeekRequest(deepSeekRequestDO);
+//        return ReturnModel.success().setData("请求已提交。");
+//    }
 }

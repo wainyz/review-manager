@@ -41,7 +41,6 @@ spring:
         acknowledge-mode: manual # 手动确认模式
 
 
-
 # 保存user file的base path
 file:
   data-file-base-path: ./user/file/

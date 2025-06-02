@@ -4,7 +4,9 @@ package com.wainyz.user.controller;
 import com.wainyz.commons.pojo.domin.UserDO;
 import com.wainyz.commons.pojo.vo.ReturnModel;
 import com.wainyz.user.convert.UserConvert;
+import com.wainyz.user.pojo.po.UserPO;
 import com.wainyz.user.service.UserService;
+import com.wainyz.user.utils.MyBCryptPasswordEncoder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,6 +16,8 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("user")
 public class UserController {
+    @Autowired
+    private MyBCryptPasswordEncoder encoder;
     @GetMapping("/")
     public ReturnModel ping(){
         return ReturnModel.success();
@@ -43,5 +47,24 @@ public class UserController {
 
         // 将code放在mq中，如果时间到了自动删除
         return null;
+    }
+    @GetMapping("/get/{userId}")
+    ReturnModel getUserById(@PathVariable("userId")Long userId){
+        UserDO userById = userService.getUserById(userId);
+        return ReturnModel.success().setData(userById);
+    }
+    @PostMapping("/update_info")
+    ReturnModel updateUserInfo(@RequestAttribute("user_id")Long userId,
+                               @RequestParam("username") String username,
+                               @RequestParam("email") String email,
+                               @RequestParam("password")String password){
+        UserPO userPO = new UserPO();
+        userPO.setUserId(userId).setUsername(username).setEmail(email).setPassword(encoder.encode(password));
+        boolean b = userService.updateById(userPO);
+        if(b){
+            return ReturnModel.success();
+        }else{
+            return ReturnModel.fail();
+        }
     }
 }

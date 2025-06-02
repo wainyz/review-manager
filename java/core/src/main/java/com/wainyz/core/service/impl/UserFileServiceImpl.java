@@ -4,7 +4,7 @@ package com.wainyz.core.service.impl;
 import cn.hutool.core.util.IdUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.wainyz.core.mapper.UserFileMapper;
-import com.wainyz.core.pojo.domin.ControllerFileDO;
+import com.wainyz.core.pojo.domain.ControllerFileDO;
 import com.wainyz.core.pojo.po.UserFilePO;
 import com.wainyz.core.service.UserFileService;
 import org.slf4j.Logger;
@@ -18,7 +18,11 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
+/**
+ * @author Yanion_gwgzh
+ */
 @Service
 public class UserFileServiceImpl extends ServiceImpl<UserFileMapper, UserFilePO> implements UserFileService {
     private final Logger logger = LoggerFactory.getLogger(UserFileService.class);
@@ -32,6 +36,13 @@ public class UserFileServiceImpl extends ServiceImpl<UserFileMapper, UserFilePO>
 
     @Value("${file.controller-file-base-path}")
     private String controllerFileBasePath;
+
+    @Override
+    // TODO: 这里的模糊查询性能特别差
+    public List<UserFilePO> searchFileByTitle(String titleKey) {
+        List<UserFilePO> list = lambdaQuery().eq(UserFilePO::getIsPublic, true).like(UserFilePO::getTitle, '%' + titleKey + '%').list();
+        return list;
+    }
 
     @Override
     public Long saveFile(String title, MultipartFile file, Long userId, int isPublish) {

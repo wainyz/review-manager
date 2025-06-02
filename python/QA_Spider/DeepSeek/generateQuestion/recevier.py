@@ -130,17 +130,22 @@ def handle_response(response, userId, fileId, request_enum):
     print("[129]获取到deepseek返回 over")
     print("deep seek response: ", response)
     response_queue = ""
+    messageIdEndWith = ""
+    # 判断请求类型
     if request_enum == "GENERATE_QUESTION" or request_enum == 0:
         response_queue = RESPONSE_QUEUE
+    elif request_enum == "GENERATE_SCORING" or request_enum == 1:
+        response_queue = RESPONSE_SCORING_QUEU
     else:
-        response_queue = RESPONSE_SCORING_QUEUE
+        response_queue = RESPONSE_SCORING_QUEU
+        messageIdEndWith = "exam"
     """增强型回调处理"""
     max_retries = 3
     for attempt in range(max_retries):
         try:
             # 每次获取新通道
             channel0 = ChannelManager().get_channel()
-            message_id = userId+":"+fileId
+            message_id = userId+":"+fileId+messageIdEndWith
             message = {
                 'id': message_id,
                 'response': response,

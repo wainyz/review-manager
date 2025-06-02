@@ -39,7 +39,7 @@ public class JwtUtilsTests {
     @Test
     public void testGenerateToken() {
         logger.info("[generate test] begin:");
-        String token = jwtUtils.generateToken(new DefaultClaims(testData));
+        String token = jwtUtils.generateToken(new DefaultClaims(testData),1000000000000000L);
         assert token != null;
         logger.info("[generate test] end token:\n{}",token);
     }
@@ -113,5 +113,16 @@ public class JwtUtilsTests {
             assert e.getExceptionReason() == MyJwtException.MyJwtExceptionEnum.OTHER_ERROR;
         }
         logger.info("[validate test] end");
+    }
+
+    /**
+     * 测试之前的token能否解析
+     */
+    @Test
+    public void oldTokenTest() throws MyJwtException {
+        String token = "eyJhbGciOiJIUzUxMiJ9.eyJ1c2VySWQiOiIxIiwiZW1haWwiOiJwbGF5ZXJfc2ltcGxlQDE2My5jb20iLCJpYXQiOjE3NDcxOTExNzEsImV4cCI6MTc0NzI3NzU3MX0.uoiEboGs98kvbqleABmCH7kkSHI7IhjpSro-j2MoX5rv9EndHm7ITDss4w62eSt0mqDqCgQMPfXIlWc3AwRzQQ";
+        Claims claims = jwtUtils.parseToken(token);
+        System.out.println(claims);
+        assert !claims.isEmpty();
     }
 }

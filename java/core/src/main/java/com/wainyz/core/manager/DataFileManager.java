@@ -1,8 +1,8 @@
 package com.wainyz.core.manager;
 
 
-import com.wainyz.core.pojo.domin.ControllerFileDO;
-import com.wainyz.core.pojo.domin.HistoryFileDO;
+import com.wainyz.core.pojo.domain.ControllerFileDO;
+import com.wainyz.core.pojo.domain.HistoryFileDO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -108,6 +108,9 @@ public class DataFileManager {
      */
     public final String getAnswerFileBasePath(String fileId){
         return ControllerFileBasePath + ANSWER_FILE_PREFIX +fileId+"/";
+    }
+    public final String getExamFileBasePath(String userId){
+        return CurrenQuestionFileBasePath + userId + '/';
     }
     public final String CurrenQuestionFileBasePath;
     /*
@@ -303,5 +306,12 @@ public class DataFileManager {
     }
     public void deleteAnswerFile(String fileId){
         new File(getAnswerFileBasePath(fileId), fileId).delete();
+    }
+    // ---------------6-----------
+    public void saveExamFile(Long userId, Long examId, String examContent) throws IOException, NumberFormatException {
+        saveFile(getExamFileBasePath(String.valueOf(userId)), String.valueOf(examId),examContent);
+    }
+    public void deleteExamFile(String userId, String examId){
+        new File(getExamFileBasePath(userId),examId).delete();
     }
 }

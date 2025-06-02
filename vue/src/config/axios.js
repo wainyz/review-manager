@@ -49,22 +49,22 @@ instance.interceptors.response.use(
           router.push('/login')
           break
         case 403:
-          ElMessage.error('403拒绝访问')
+          ElMessage.error('您的token已过期，请重新登录')
           break
         case 404:
-          ElMessage.error('404请求错误，未找到该资源')
+          ElMessage.error('请求错误，未找到该资源'+error.response.data.message)
           break
         case 500:
           ElMessage.error('500服务器错误')
           break
         default:
-          ElMessage.error(`其他错误码${error.response.status}`)
+          ElMessage.error(`${error.response.data.message}`)
       }
     } else {
       if (error.message.includes('timeout')) {
         ElMessage.error('请求超时')
       } else {
-        ElMessage.error('未知错误')
+        //ElMessage.error('未知错误')
       }
     }
     return Promise.reject(error)

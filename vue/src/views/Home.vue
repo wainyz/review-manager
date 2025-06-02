@@ -11,7 +11,7 @@
 
     <DocumentSidebar
       v-model="sidebarVisible"
-      :documents="documents"
+      :documents="filteredDocuments"
       v-model:searchQuery="searchQuery"
       @select-document="handleDocumentSelect"
     />
@@ -19,7 +19,7 @@
     <ProfileDrawer
       v-model="profileVisible"
       :userInfo="userInfo"
-      @edit-profile="editProfile"
+      @update-profile="handleProfileUpdate"
       @logout="handleLogout"
     />
 
@@ -34,7 +34,7 @@
 </template>
 
 <script setup>
-import { reactive, ref, onMounted } from 'vue'
+import { reactive, ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { getFullUrl } from '../config/api'
 import request from '../config/axios'
@@ -74,16 +74,21 @@ const toggleTheme = () => {
 
 // 个人信息
 const userInfo = reactive({
-  username: '用户名',
-  email: '',
+  username: JSON.parse(localStorage.getItem('userInfo'))?.username || '用户名',
+  email: JSON.parse(localStorage.getItem('userInfo'))?.email || '',
   documentCount: 0,
 })
 
 // 显示个人信息
 const showProfile = () => {
+  // 从localStorage获取最新的用户信息
+  const storedUserInfo = JSON.parse(localStorage.getItem('userInfo'))
+  if (storedUserInfo) {
+    userInfo.username = storedUserInfo.username
+    userInfo.email = storedUserInfo.email
+  }
   profileVisible.value = true
 }
-
 const updateProfile = async () => {
   const response = await request.get(getFullUrl(API_PATHS.DocumentCount))
   userInfo.documentCount = response.data.data
@@ -214,6 +219,13 @@ const toggleSidebar = () => {
 
 // 个人文档列表
 const documents = ref([])
+
+// 过滤后的文档列表
+const filteredDocuments = computed(() => {
+  if (!searchQuery.value) return documents.value
+  const query = searchQuery.value.toLowerCase()
+  return documents.value.filter(doc => doc.title.toLowerCase().includes(query))
+})
 // 查询文档列表
 const searchDocuments = async () => {
   try {
@@ -225,8 +237,27 @@ const searchDocuments = async () => {
 }
 
 // 编辑个人信息
-const editProfile = () => {
-  // 待实现
+const handleProfileUpdate = async (updatedInfo) => {
+  try {
+    const response = await request.post(getFullUrl(API_PATHS.UpdateProfile), updatedInfo)
+    if (response.data.code === 200) {
+      // 更新本地存储的用户信息
+      const storedUserInfo = JSON.parse(localStorage.getItem('userInfo') || '{}')
+      Object.assign(storedUserInfo, updatedInfo)
+      localStorage.setItem('userInfo', JSON.stringify(storedUserInfo))
+      
+      // 更新当前显示的用户信息
+      userInfo.username = updatedInfo.username
+      userInfo.email = updatedInfo.email
+      
+      ElMessage.success('个人信息更新成功')
+    } else {
+      ElMessage.error(response.data.message || '更新失败')
+    }
+  } catch (error) {
+    console.error('更新个人信息失败:', error)
+    ElMessage.error('更新个人信息失败')
+  }
 }
 
 // 最低掌握度文档

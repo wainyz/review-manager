@@ -18,4 +18,5 @@ public interface UserService extends IService<UserPO> {
     Boolean deleteUser(Long id);
 
     Boolean deleteUser(String email);
+    Boolean findUsername(String username);
 }

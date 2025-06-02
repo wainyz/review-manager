@@ -2,7 +2,7 @@
   <el-drawer v-model="visible" title="个人信息" direction="rtl" @update:modelValue="$emit('update:modelValue', $event)">
     <div class="profile-info">
       <div class="avatar-section">
-        <el-avatar :size="100" src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png" />
+        <el-avatar :size="100" src="head.png" />
         <h3>{{ userInfo.username }}</h3>
       </div>
       <el-divider />
@@ -14,15 +14,21 @@
         </el-descriptions>
       </div>
       <div class="action-section">
-        <el-button type="primary" @click="$emit('edit-profile')">修改信息</el-button>
+        <el-button type="primary" @click="showEditDialog">修改信息</el-button>
         <el-button type="danger" @click="$emit('logout')">退出登录</el-button>
       </div>
     </div>
+    <EditProfileDialog
+      v-model="editDialogVisible"
+      :user-info="userInfo"
+      @update-profile="handleProfileUpdate"
+    />
   </el-drawer>
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
+import EditProfileDialog from './EditProfileDialog.vue'
 
 const props = defineProps({
   modelValue: Boolean,
@@ -32,12 +38,22 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['update:modelValue', 'edit-profile', 'logout'])
+const emit = defineEmits(['update:modelValue', 'edit-profile', 'logout', 'update-profile'])
 
 const visible = computed({
   get: () => props.modelValue,
   set: (value) => emit('update:modelValue', value)
 })
+
+const editDialogVisible = ref(false)
+
+const showEditDialog = () => {
+  editDialogVisible.value = true
+}
+
+const handleProfileUpdate = (updatedInfo) => {
+  emit('update-profile', updatedInfo)
+}
 </script>
 
 <style scoped>

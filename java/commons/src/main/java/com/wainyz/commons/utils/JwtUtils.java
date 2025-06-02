@@ -3,6 +3,7 @@ package com.wainyz.commons.utils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wainyz.commons.exception.MyJwtException;
 import io.jsonwebtoken.*;
+import io.jsonwebtoken.security.Keys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Date;
 import java.util.UUID;
@@ -30,13 +32,14 @@ public class JwtUtils {
     public ObjectMapper objectMapper;
 
     public JwtUtils(
-            @Value("${jwt.secretKey:123njkjc42JK32*#242kjlfsi}") String secretKeyString,
+            @Value("${jwt.secretKey:eyJ1c2VySWQiOiIxIiwiZW1haWwiOiJ3YWlueXpAcXEuY29tIiwiaWF0IjoxNzQ3MTkwMDQ3LCJleHAiOjE3NDcyNzY0NDd9eyJ1c2VySWQiOiIxIiwiZW1haWwiOiJ3YWlueXpAcXEuY29tIiwiaWF0IjoxNzQ3MTkwMDQ3LCJleHAiOjE3NDcyNzY0NDd9eyJ1c2VySWQiOiIxIiwiZW1haWwiOiJ3YWlueXpAcXEuY29tIiwiaWF0Ijoasdf3}") String secretKeyString,
             @Value("${jwt.expirationTime:86400}") String expirationTime
     ) {
         this.secretKeyString = expendSecretKey(secretKeyString, 256);
         this.expirationTime = Long.parseLong(expirationTime);
 //        this.secretKey = Keys.hmacShaKeyFor(secretKeyString.getBytes(StandardCharsets.UTF_8));
-        this.secretKey = Jwts.SIG.HS256.key().build();
+        //this.secretKey = Jwts.SIG.HS256.key().build();
+        this.secretKey = Keys.hmacShaKeyFor(secretKeyString.getBytes(StandardCharsets.UTF_8));
     }
 
     /**

@@ -20,7 +20,7 @@ public class CosWebMvcConfigurer implements WebMvcConfigurer {
     public final String allowedHeaders;
     public CosWebMvcConfigurer(
             @Value("${cors.mappingUrl:/**}") String mappingUrl,
-            @Value("${cors.allowedOrigins:http://localhost:5173}") String allowedOrigins,
+            @Value("${cors.allowedOrigins:http://localhost:5173,https://wainyz.online}") String allowedOrigins,
             @Value("${cors.allowedMethods:*}") String allowedMethods,
             @Value("${cors.allowedHeaders:*}") String allowedHeaders
     ) {
@@ -39,17 +39,31 @@ public class CosWebMvcConfigurer implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         // 允许跨域访问的路径
-        registry.addMapping(mappingUrl)
-                // 允许的源（域名），可以是多个
-                .allowedOrigins(allowedOrigins.split(","))
-                // 允许的 HTTP 方法
-                .allowedMethods(allowedMethods.split(","))
-                // 允许的请求头
-                .allowedHeaders(allowedHeaders.split(","))
-                // 是否允许发送 Cookie
+        registry.addMapping("/**")
+                .allowedOrigins(
+                        allowedOrigins.split(",")
+                )
+                .allowedMethods("*")
+                .allowedHeaders("*")
+                .exposedHeaders("Access-Control-Allow-Headers",
+                        "Access-Control-Allow-Methods",
+                        "Access-Control-Allow-Origin",
+                        "Access-Control-Max-Age",
+                        "Access-Control-Request-Headers",
+                        "X-Frame-Options")
                 .allowCredentials(true)
-                // 预检请求的缓存时间（秒）
                 .maxAge(3600);
+//        registry.addMapping(mappingUrl)
+//                // 允许的源（域名），可以是多个
+//                .allowedOrigins(allowedOrigins.split(","))
+//                // 允许的 HTTP 方法
+//                .allowedMethods(allowedMethods.split(","))
+//                // 允许的请求头
+//                .allowedHeaders(allowedHeaders.split(","))
+//                // 是否允许发送 Cookie
+//                .allowCredentials(true)
+//                // 预检请求的缓存时间（秒）
+//                .maxAge(3600);
     }
 
 }

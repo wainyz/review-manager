@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.wainyz.core.consident.AttenuationEnum;
-import com.wainyz.core.pojo.domin.ControllerFileDO;
+import com.wainyz.core.pojo.domain.ControllerFileDO;
 import io.jsonwebtoken.lang.Collections;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

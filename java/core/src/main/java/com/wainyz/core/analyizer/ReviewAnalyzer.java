@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wainyz.core.consident.AttenuationEnum;
 import com.wainyz.core.convert.QuestionAndMasteryRecordConverter;
 import com.wainyz.core.manager.DataFileManager;
-import com.wainyz.core.pojo.domin.*;
+import com.wainyz.core.pojo.domain.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

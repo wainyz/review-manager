@@ -1,6 +1,7 @@
 // API配置文件
 
 // API基础URL
+//export const BASE_URL = 'https://wainyz.online/api'
 export const BASE_URL = 'http://localhost:80'
 
 // API路径配置
@@ -37,6 +38,14 @@ export const API_PATHS = {
   AvarageWaitTime : '/file_info/averageWaitTime',
   // 获取当前请求状态
   RequestStatus : '/file_info/requestStatus',
+  
+  // 消息相关
+  GET_MESSAGES: '/message/list',
+  READ_MESSAGE: '/message/read',
+  READ_ALL_MESSAGES: '/message/read-all',
+
+  //生成试卷
+  generatePaper: '/paper/generate',
 }
 
 // 获取完整的API URL

@@ -20,6 +20,37 @@ const routes = [
     name: 'Home',
     component: () => import('../views/Home.vue'),
     meta: { requiresAuth: true }
+  },
+  {
+    path: '/exam',
+    name: 'Exam',
+    component: () => import('../views/PaperConfigView.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/paper/config',
+    name: 'PaperConfig',
+    component: () => import('../views/PaperConfigView.vue')
+  },
+  {
+    path: '/paper/edit/:id?', // 添加可选参数id，方便后续编辑已有试卷
+    name: 'PaperEdit',
+    component: () => import('../views/PaperEditView.vue'),
+    props: true
+  },
+  {
+    path: '/chat/:friendId',
+    name: 'Chat',
+    component: () => import('../views/ChatView.vue'),
+    props: true,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/class/chat/:classId',
+    name: 'ClassChat',
+    component: () => import('../views/ClassChatView.vue'),
+    props: true,
+    meta: { requiresAuth: true }
   }
 ]
 

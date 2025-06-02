@@ -722,11 +722,14 @@ const getMasteryStatus = (mastery) => {
   return 'exception'
 }
 
+// 衰减等级的颜色映射：
 const getAttenuationType = (level) => {
   const types = {
-    0: 'success',
-    1: 'warning',
-    2: 'danger'
+    1: 'success',  // 绿色
+    2: 'warning',  // 黄色
+    3: 'info',     // 蓝色
+    4: 'warning',  // 黄色
+    5: 'danger'    // 红色
   }
   return types[level] || 'info'
 }
@@ -1473,7 +1476,7 @@ const generatingQuestions = ref(false)
 // 添加复习队列相关的状态
 const reviewQueue = ref([])
 const showSelectionMenu = ref(false)
-const selectionMenuPosition = ref({ top: 0, left: 0 })
+const selectionMenuPosition = ref({ top: 100, left: 100 })
 const selectedText = ref('')
 
 // 处理文本选择事件
@@ -1496,8 +1499,8 @@ const handleTextSelection = (event) => {
     const menuWidth = 160 // 增加菜单宽度以适应内容
     const menuHeight = 48 // 增加菜单高度以提升可点击区域
     
-    let left = event.clientX
-    let top = event.clientY + 10 // 在鼠标位置下方10px
+    let left = event.clientX - 150
+    let top = event.clientY - 100 // 在鼠标位置下方10px
     
     // 确保菜单不会超出右边界
     if (left + menuWidth > window.innerWidth) {
