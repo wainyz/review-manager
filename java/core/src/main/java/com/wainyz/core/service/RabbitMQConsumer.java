@@ -121,8 +121,8 @@ public class RabbitMQConsumer {
                 // 获取 fileId，实际上是noticeId作为paperId
                 String paperId = message.getId();
                 Paper paper = new Paper();
-                paper.setId(Long.valueOf(paperId));
-                paper.setUserId(Long.valueOf(message.getUserId()));
+                paper.setId(paperId);
+                paper.setUserId(message.getUserId());
                 paper.setContent(message.getResponse());
                 Notice notice = noticeService.getById(message.getId());
                 Map<String, String> parser = NoticeTypeEnum.WAITING_GENERATION.parser(notice.getContent());

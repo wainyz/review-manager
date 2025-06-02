@@ -900,9 +900,9 @@ function escapeHtml(unsafe) {
             .replace(/'/g, "&#039;")
             .replace("${blank_1}",)
 }
-function renderExamToHTML(examData) {
-  examData = JSON.parse(examData)
-  let html = `<h3>试卷描述：</h3><p>${escapeHtml(examData.description)}</p>`;
+function renderExamToHTML(paper) {
+  let examData = JSON.parse(paper.content)
+  let html = `<h1>${paper.name}</h1><h3>试卷描述：</h3><p>${escapeHtml(examData.description)}</p>`;
   examData.questionBlocks.forEach(block => {
     html += `<div class="question-block"><h2>${escapeHtml(block.questionsTitle)}</h2>`;
     block.questions.forEach(question => {
@@ -925,7 +925,7 @@ function renderExamToHTML(examData) {
 const showPaperDetail = (paperId) => {
   const paper = papers.value.find(p => p.id === paperId)
   if (paper) {
-    ElMessageBox.alert(renderExamToHTML(paper.content), paper.name, {
+    ElMessageBox.alert(renderExamToHTML(paper), paper.name, {
       confirmButtonText: '导出为word',
       width: '80%',
       customClass: 'large-message-box',
@@ -954,7 +954,7 @@ const showPaperDetail = (paperId) => {
 const exportToWord = (paper) => {
   try {
     // 创建一个新的 Blob 对象
-    const content = renderExamToHTML(paper.content)
+    const content = renderExamToHTML(paper)
     const blob = new Blob([`
       <html xmlns:o='urn:schemas-microsoft-com:office:office' 
             xmlns:w='urn:schemas-microsoft-com:office:word' 

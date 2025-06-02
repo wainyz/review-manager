@@ -12,9 +12,9 @@ import java.io.Serializable;
 */
 @Data
 public class Paper implements Serializable {
-    private Long id;
+    private String id;
     private String title;
     private Object content;
     @TableField("userId")
-    private Long userId;
+    private String userId;
 }

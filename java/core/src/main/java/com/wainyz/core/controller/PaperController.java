@@ -82,10 +82,14 @@ public class PaperController {
             @RequestParam("content") String content
     ) {
         // 生成提示词
-        paperService.lambdaUpdate().set(Paper::getContent, content)
-                .set(Paper::getTitle, title )
-                .eq( Paper::getId, paperId)
-                .eq( Paper::getUserId, userId);
-        return ReturnModel.success();
+        boolean update = paperService.lambdaUpdate().set(Paper::getContent, content)
+                .set(Paper::getTitle, title)
+                .eq(Paper::getId, paperId)
+                .eq(Paper::getUserId, userId).update();
+        if ( update){
+             return ReturnModel.success().setMessage("更新成功.");
+        }else{
+            return ReturnModel.fail().setMessage("更新失败.");
+        }
     }
 }
