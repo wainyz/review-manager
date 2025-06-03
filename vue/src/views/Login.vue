@@ -45,8 +45,8 @@ import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { Message, Lock, Key } from '@element-plus/icons-vue'
 import { ElMessage, ElLoading } from 'element-plus'
-import { API_PATHS, getFullUrl } from '../config/api'
-import request from '../config/axios'
+import { API_PATHS, getFullUrl,BASE_URL } from '../config/api'
+import instance from '../config/axios'
 
 const router = useRouter()
 const loginForm = reactive({
@@ -77,9 +77,9 @@ const rules = {
 // 定义刷新验证码的方法
 const refreshCaptcha = async () => {
   try {
-    const { data } = await (await request.post(getFullUrl(API_PATHS.REFRESH_CAPTCHA) + '?image_id=' + loginForm.image_id)).data
+    const { data } = await (await instance.post(getFullUrl(API_PATHS.REFRESH_CAPTCHA) + '?image_id=' + loginForm.image_id)).data
     loginForm.image_id = data
-    captchaUrl.value = `${request.defaults.baseURL}${API_PATHS.GET_CAPTCHA}/${data}`
+    captchaUrl.value = `${BASE_URL}${API_PATHS.GET_CAPTCHA}/${data}`
   } catch (error) {
     ElMessage.error('获取验证码失败')
   }
@@ -106,8 +106,9 @@ const handleLogin = async () => {
     text: '登录中...',
     background: 'rgba(0, 0, 0, 0.7)'
   })
+  let response = {}
   try {
-    const response = await request.post(getFullUrl(API_PATHS.LOGIN), {
+    response = await instance.post(getFullUrl(API_PATHS.LOGIN), {
       email: loginForm.email,
       password: loginForm.password,
       image_code: loginForm.image_code,
@@ -123,12 +124,10 @@ const handleLogin = async () => {
     localStorage.setItem('token', token)
     localStorage.setItem('userInfo', JSON.stringify(data))
     localStorage.setItem('userId', data.user_id)
-    
-
     ElMessage.success('登录成功')
     await router.push('/home')
   } catch (error) {
-    ElMessage.error('登录出错：', error) 
+    ElMessage.error(`${error.response.data}`) 
   } finally {
     // 刷新验证码
     refreshCaptcha()
