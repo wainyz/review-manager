@@ -116,6 +116,12 @@ public class NoticeServiceImpl extends ServiceImpl<NoticeMapper, Notice>
         saveAndNoticeUser(notice);
     }
 
+    @Override
+    public void sendNoticeToAllUser(Notice notice) {
+        save(notice);
+        webSocketMessageService.noticeAllUsers(notice);
+    }
+
 
 }
 

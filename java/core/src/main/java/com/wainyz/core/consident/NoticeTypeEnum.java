@@ -10,7 +10,7 @@ import java.util.Map;
  */
 
 public enum NoticeTypeEnum {
-    SYSTEM_ALL(0, null),
+    SYSTEM_ALL(0, "content"),
     ADD_FRIEND_APPLY(1, "applyUserId","applyUserName"),
     AGREE_FRIEND_APPLY(2, "applyUserId","agreeUserName"),
     WAITING_GENERATION(3, "title"),
@@ -28,7 +28,7 @@ public enum NoticeTypeEnum {
 
     ClassMessage(30,"classId","className","senderId","content"),
     FriendMessage(61,"senderId"),
-    SYSTEM_ONE(-1, null);
+    SYSTEM_ONE(-1, "content");
     @JsonProperty
     public final int value;
     public final String[] otherInfo;

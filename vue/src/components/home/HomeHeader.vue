@@ -1689,7 +1689,12 @@ const sendNotice = async () => {
   }
 
   try {
-    const response = await request.post(getFullUrl(API_PATHS.NOTICE_ALL), noticeForm.value.content)
+    var formdata = new FormData()
+    formdata.append("content",noticeForm.value.content)
+    const response = await instance.post(getFullUrl(API_PATHS.NOTICE_ALL), formdata, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }})
     if (response.data && response.data.code === 200) {
       ElMessage.success('发送通知成功')
       noticeForm.value.content = ''

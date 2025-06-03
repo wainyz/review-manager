@@ -15,8 +15,11 @@ public interface NoticeService extends IService<Notice> {
 
     boolean addFriendApplyNotice(Long userId, String username, Long friendId);
 
-    boolean agreeFriendApplyNotice(Long userId,String username, Long friendId);
+    boolean agreeFriendApplyNotice(Long userId, String username, Long friendId);
+
     boolean saveAndNoticeUser(Notice notice);
 
     void rejectFriendApplyNotice(Long userId, String username, Long friendId);
+
+    void sendNoticeToAllUser(Notice notice);
 }

@@ -193,17 +193,17 @@ public class PermissionApiController {
         return ReturnModel.success().setData(userPermission);
     }
 
-    @PostMapping("/notice/all")
-    public ReturnModel noticeAllUser(@RequestAttribute(GatewayConsistent.USER_ID) Long userId, @RequestBody String noticeContent){
-        //权限校验
-        Integer userPermission = userPermissionService.getUserPermission(userId);
-        Integer servicePermission = permissionRegistryService.getServicePermission(PermissionType.notice.name());
-        if((userPermission&(1 << servicePermission)) == 0){
-            return ReturnModel.fail().setMessage("没有权限。");
-        }
-        // 调用noticeService的发送到全局的操作
-
-        return ReturnModel.success();
-    }
+//    @PostMapping("/notice/all")
+//    public ReturnModel noticeAllUser(@RequestAttribute(GatewayConsistent.USER_ID) Long userId, @RequestBody String noticeContent){
+//        //权限校验
+//        Integer userPermission = userPermissionService.getUserPermission(userId);
+//        Integer servicePermission = permissionRegistryService.getServicePermission(PermissionType.notice.name());
+//        if((userPermission&(1 << servicePermission)) == 0){
+//            return ReturnModel.fail().setMessage("没有权限。");
+//        }
+//        // 调用noticeService的发送到全局的操作
+//
+//        return ReturnModel.success();
+//    }
 
 }
