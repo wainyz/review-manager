@@ -74,7 +74,7 @@ public class PermissionControllerTests {
         permissionApiController.init();
         logger.info("[system]开始测试：尝试解封。");
         logger.info("封禁名单如下：{}", permissionApiController.showBanUsers(3L));
-        ReturnModel returnModel = permissionApiController.updateBanUser(3L, 2L, System.currentTimeMillis() - 1);
+        ReturnModel returnModel = permissionApiController.updateBanUser("3", "2", System.currentTimeMillis() - 1);
         logger.info("更新之后: {}",returnModel);
 
         logger.info("[system]开始测试：封禁用户.");

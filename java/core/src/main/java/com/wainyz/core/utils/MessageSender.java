@@ -5,8 +5,9 @@ import cn.hutool.core.util.IdUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wainyz.commons.consistent.RabbitMqConsistent;
+import com.wainyz.commons.consistent.RedisKeyConsistent;
+import com.wainyz.commons.utils.RedisOps;
 import com.wainyz.core.consident.NoticeTypeEnum;
-import com.wainyz.core.manager.QuickStatusManager;
 import com.wainyz.core.pojo.domain.DeepSeekRequestDO;
 import com.wainyz.core.pojo.domain.Notice;
 import com.wainyz.core.service.NoticeService;
@@ -24,7 +25,7 @@ import java.util.Date;
 public class MessageSender {
     private final RabbitTemplate rabbitTemplate;
     @Autowired
-    private QuickStatusManager quickStatusManager;
+    private RedisOps redisOps;
     @Autowired
     private ObjectMapper objectMapper;
     @Autowired
@@ -52,6 +53,13 @@ public class MessageSender {
             message.getMessageProperties().setMessageId(String.valueOf(requestDO.getMessageId()));
             return message;
         });
+        // 4 增加redis中的数量记录
+        if(requestDO.getDeepSeekRequestEnum()== DeepSeekRequestDO.DeepSeekRequestEnum.GENERATE_PAPER
+        || requestDO.getDeepSeekRequestEnum()== DeepSeekRequestDO.DeepSeekRequestEnum.GENERATE_TEST){
+            redisOps.safeIncrement(RedisKeyConsistent.question_request.name());
+        }else{
+            redisOps.safeIncrement(RedisKeyConsistent.scoring_request.name());
+        }
         return waitingNotice;
     }
 

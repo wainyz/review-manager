@@ -46,6 +46,16 @@ export const API_PATHS = {
 
   //生成试卷
   generatePaper: '/paper/generate',
+
+  // 权限相关
+  GET_USER_PERMISSION: '/permission/getUserPermission',
+  SHOW_RABBITMQ_INFO: '/permission/showRabbitMqInfo',
+  SHOW_WEBSOCKET: '/permission/showWebsocket',
+  SHOW_BAN_USERS: '/permission/showBanUsers',
+  BAN_USER: '/permission/banUser',
+  UPDATE_BAN_USER: '/permission/updateBanUser',
+  NOTICE_ALL: '/permission/notice/all',
+  UPDATE_USER_PERMISSION: '/permission/updateUserPermission',
 }
 
 // 获取完整的API URL

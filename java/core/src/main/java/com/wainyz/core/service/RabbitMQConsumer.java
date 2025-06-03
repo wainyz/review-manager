@@ -5,6 +5,8 @@ import cn.hutool.core.util.IdUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.rabbitmq.client.Channel;
 import com.wainyz.commons.consistent.RabbitMqConsistent;
+import com.wainyz.commons.consistent.RedisKeyConsistent;
+import com.wainyz.commons.utils.RedisOps;
 import com.wainyz.core.analyizer.QuestionFileAnalyzer;
 import com.wainyz.core.analyizer.ReviewAnalyzer;
 import com.wainyz.core.consident.NoticeTypeEnum;
@@ -45,6 +47,8 @@ public class RabbitMQConsumer {
     private PaperService paperService;
     @Autowired
     private NoticeService noticeService;
+    @Autowired
+    private RedisOps redisOps;
     private static final Logger logger = LoggerFactory.getLogger(RabbitMQConsumer.class);
     // 用于存储最近五次的等待时间，默认值给的60s
     private static final int[] waitingArray = new int[]{60,60,60,60,60};
@@ -91,12 +95,15 @@ public class RabbitMQConsumer {
             if(quickStatusManager.shouldBeginRecordReceiver()){
                 quickStatusManager.receiverRecord(message.getUserId()+":"+message.getUserId());
             }
+            // 4 减少redis
+            redisOps.safeDecrement(RedisKeyConsistent.question_request.name());
         } catch (Exception e) {
             // 系统异常处理
             logger.error("系统异常: {}", e.getMessage());
             channel.basicNack(deliveryTag, false, false);
             // 直接丢弃
         }
+
     }
 
     /**
@@ -183,6 +190,8 @@ public class RabbitMQConsumer {
             if(quickStatusManager.shouldBeginRecordReceiver()){
                 quickStatusManager.receiverRecord(message.getUserId()+":"+message.getUserId());
             }
+            // 4 减少redis
+            redisOps.safeDecrement(RedisKeyConsistent.scoring_request.name());
         } catch (Exception e) {
             // 系统异常处理
             logger.error("系统异常: {}", e.getMessage());

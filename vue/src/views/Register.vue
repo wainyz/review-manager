@@ -168,6 +168,7 @@ const handleRegister = async () => {
       router.push('/login')
     } catch (error) {
       ElMessage.error('注册失败')
+      ElMessage.error(`${error.response.data}`) 
       refreshCaptcha()
     } finally {
       loading.close()

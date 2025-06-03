@@ -16,6 +16,13 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class RedisOps {
 
+    public void safeIncrement(String key) {
+        redisTemplate.opsForValue().increment(key);
+    }
+    public void safeDecrement(String key) {
+        redisTemplate.opsForValue().decrement(key);
+    }
+
     private final RedisTemplate<String, String> redisTemplate;
     public RedisOps (@Autowired RedisTemplate<String, String> redisTemplate) {
         this.redisTemplate = redisTemplate;

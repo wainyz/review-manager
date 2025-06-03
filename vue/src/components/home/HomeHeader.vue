@@ -245,6 +245,151 @@
       </div>
       
       <el-button @click="$emit('toggle-theme')" class="theme-btn" :icon="Sunny" circle />
+      <!-- 添加管理按钮 -->
+      <el-button 
+        v-if="hasAdminPermission" 
+        @click="toggleAdminPanel" 
+        class="admin-btn" 
+        :icon="Setting" 
+        circle 
+      />
+      <el-drawer
+        v-model="adminPanelVisible"
+        title="系统管理"
+        direction="rtl"
+        size="350px"
+        :with-header="true"
+        :show-close="true"
+        :modal="true"
+        :append-to-body="true"
+      >
+        <template #header>
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span>系统管理</span>
+          </div>
+        </template>
+        <div class="admin-panel">
+          <el-tabs>
+            <el-tab-pane label="系统状态">
+              <div class="status-section">
+                <h4>RabbitMQ状态</h4>
+                <el-descriptions :column="1" border>
+                  <el-descriptions-item label="题目请求队列">
+                    {{ rabbitMqStatus.question_request || 0 }}
+                  </el-descriptions-item>
+                  <el-descriptions-item label="评分请求队列">
+                    {{ rabbitMqStatus.scoring_request || 0 }}
+                  </el-descriptions-item>
+                </el-descriptions>
+                <h4>WebSocket连接数</h4>
+                <el-descriptions :column="1" border>
+                  <el-descriptions-item label="当前连接数">
+                    {{ websocketCount || 0 }}
+                  </el-descriptions-item>
+                </el-descriptions>
+              </div>
+            </el-tab-pane>
+            <el-tab-pane label="用户管理">
+              <div class="user-management">
+                <h4>封禁用户列表</h4>
+                <div v-if="bannedUsers.length > 0">
+                  <div v-for="user in bannedUsers" :key="user.id" class="banned-user-item">
+                    <el-descriptions :column="1" border>
+                      <el-descriptions-item label="用户ID">
+                        {{ user.id }}
+                      </el-descriptions-item>
+                      <el-descriptions-item label="用户名">
+                        {{ user.username }}
+                      </el-descriptions-item>
+                      <el-descriptions-item label="邮箱">
+                        {{ user.email }}
+                      </el-descriptions-item>
+                      <el-descriptions-item label="解封时间">
+                        {{ formatDate(user.liftTime) }}
+                      </el-descriptions-item>
+                    </el-descriptions>
+                    <div class="banned-user-actions">
+                      <el-button 
+                        type="primary" 
+                        size="small"
+                        @click="updateBanUser(user.id, Date.now())"
+                      >
+                        解除封禁
+                      </el-button>
+                      <el-button 
+                        type="warning" 
+                        size="small"
+                        @click="showUpdateBanDialog(user)"
+                      >
+                        修改时间
+                      </el-button>
+                    </div>
+                  </div>
+                </div>
+                <el-empty v-else description="暂无封禁用户" />
+                
+                <div class="ban-user-section">
+                  <h4>封禁用户</h4>
+                  <el-form :model="banForm" label-width="80px">
+                    <el-form-item label="用户ID">
+                      <el-input v-model="banForm.userId" />
+                    </el-form-item>
+                    <el-form-item label="封禁时长">
+                      <el-select v-model="banForm.duration">
+                        <el-option label="1天" :value="24 * 60 * 60 * 1000" />
+                        <el-option label="7天" :value="7 * 24 * 60 * 60 * 1000" />
+                        <el-option label="30天" :value="30 * 24 * 60 * 60 * 1000" />
+                        <el-option label="永久" :value="365 * 24 * 60 * 60 * 1000" />
+                      </el-select>
+                    </el-form-item>
+                    <el-form-item>
+                      <el-button type="primary" @click="banUser">确认封禁</el-button>
+                    </el-form-item>
+                  </el-form>
+                </div>
+
+                <div class="permission-section">
+                  <h4>修改用户权限</h4>
+                  <el-form :model="permissionForm" label-width="100px">
+                    <el-form-item label="用户ID">
+                      <el-input v-model="permissionForm.userId" />
+                    </el-form-item>
+                    <el-form-item label="权限">
+                      <el-select v-model="permissionForm.permission">
+                        <el-option label="普通用户" :value="0" />
+                        <el-option label="管理员" :value="1" />
+                        <el-option label="超级管理员" :value="0b111111111111111111" />
+                      </el-select>
+                    </el-form-item>
+                    
+                    <el-form-item>
+                      <el-button type="primary" @click="updateUserPermission">确认修改</el-button>
+                    </el-form-item>
+                  </el-form>
+                </div>
+              </div>
+            </el-tab-pane>
+            <el-tab-pane label="通知管理">
+              <div class="notice-management">
+                <h4>发送通知</h4>
+                <el-form :model="noticeForm" label-width="80px">
+                  <el-form-item label="通知内容">
+                    <el-input 
+                      v-model="noticeForm.content" 
+                      type="textarea" 
+                      :rows="4"
+                      placeholder="请输入通知内容"
+                    />
+                  </el-form-item>
+                  <el-form-item>
+                    <el-button type="primary" @click="sendNotice">发送通知</el-button>
+                  </el-form-item>
+                </el-form>
+              </div>
+            </el-tab-pane>
+          </el-tabs>
+        </div>
+      </el-drawer>
       <div class="message-container">
         <el-badge :value="unreadCount" :hidden="unreadCount === 0" class="message-badge">
           <el-button @click="toggleMessagePopover" class="message-btn" :icon="Bell" circle />
@@ -441,7 +586,7 @@
 </template>
 
 <script setup>
-import { Document, Reading, Upload, Sunny, Bell, User, School, Files, Calendar } from '@element-plus/icons-vue'
+import { Document, Reading, Upload, Sunny, Bell, User, School, Files, Calendar, Setting } from '@element-plus/icons-vue'
 import { ref, computed, onUnmounted, onMounted, watch } from 'vue'
 import request from '../../config/axios'
 import { API_PATHS, getFullUrl } from '../../config/api'
@@ -1522,6 +1667,210 @@ const submitEditPaper = async () => {
     isEditing.value = false
   }
 }
+
+// 添加管理按钮
+const toggleAdminPanel = () => {
+  adminPanelVisible.value = !adminPanelVisible.value
+}
+
+// 在 script setup 中添加新的状态和方法
+const adminPanelVisible = ref(false)
+const rabbitMqStatus = ref({})
+const websocketCount = ref(0)
+const bannedUsers = ref([])
+const banForm = ref({})
+const noticeForm = ref({})
+
+// 添加新的方法
+const sendNotice = async () => {
+  if (!noticeForm.value.content) {
+    ElMessage.warning('请输入通知内容')
+    return
+  }
+
+  try {
+    const response = await request.post(getFullUrl(API_PATHS.NOTICE_ALL), noticeForm.value.content)
+    if (response.data && response.data.code === 200) {
+      ElMessage.success('发送通知成功')
+      noticeForm.value.content = ''
+    } else {
+      ElMessage.error(response.data?.message || '发送通知失败')
+    }
+  } catch (error) {
+    console.error('发送通知失败:', error)
+    ElMessage.error('发送通知失败')
+  }
+}
+
+const updateBanUser = async (userId, liftTime) => {
+  try {
+    const response = await request.post(getFullUrl(API_PATHS.UPDATE_BAN_USER), null, {
+      params: {
+        banUserId: userId,
+        liftTime: liftTime
+      }
+    })
+
+    if (response.data && response.data.code === 200) {
+      ElMessage.success('更新封禁用户成功')
+      bannedUsers.value = JSON.parse(response.data.data)
+    } else {
+      ElMessage.error(response.data?.message || '更新封禁用户失败')
+    }
+  } catch (error) {
+    console.error('更新封禁用户失败:', error)
+    ElMessage.error('更新封禁用户失败')
+  }
+}
+
+const showUpdateBanDialog = (user) => {
+  // 实现显示更新封禁用户时间的对话框逻辑
+  console.log('显示更新封禁用户:', user)
+}
+
+// 添加权限相关的状态和方法
+const userPermission = ref(0)
+const hasAdminPermission = computed(() => {
+  // 检查是否有showInfo权限
+  return (userPermission.value & (1 << 0)) !== 0
+})
+
+// 获取用户权限
+const fetchUserPermission = async () => {
+  try {
+    const response = await instance.post(getFullUrl(API_PATHS.GET_USER_PERMISSION))
+    if (response.data && response.data.code === 200) {
+      userPermission.value = response.data.data
+    }
+  } catch (error) {
+    console.error('获取用户权限失败:', error)
+  }
+}
+
+// 获取RabbitMQ状态
+const fetchRabbitMqStatus = async () => {
+  try {
+    const response = await request.post(getFullUrl(API_PATHS.SHOW_RABBITMQ_INFO))
+    if (response.data && response.data.code === 200) {
+      rabbitMqStatus.value = JSON.parse(response.data.data)
+    }
+  } catch (error) {
+    console.error('获取RabbitMQ状态失败:', error)
+  }
+}
+
+// 获取WebSocket连接数
+const fetchWebsocketCount = async () => {
+  try {
+    const response = await instance.post(getFullUrl(API_PATHS.SHOW_WEBSOCKET))
+    if (response.data && response.data.code === 200) {
+      websocketCount.value = parseInt(response.data.data)
+    }
+  } catch (error) {
+    console.error('获取WebSocket连接数失败:', error)
+  }
+}
+
+// 获取封禁用户列表
+const fetchBannedUsers = async () => {
+  try {
+    const response = await request.post(getFullUrl(API_PATHS.SHOW_BAN_USERS))
+    if (response.data && response.data.code === 200) {
+      // 解析返回的 JSON 字符串
+      const bannedUsersData = JSON.parse(response.data.data)
+      bannedUsers.value = bannedUsersData.map(user => ({
+        id: user.user_id,
+        email: user.email,
+        username: user.username,
+        liftTime: user.lift_time
+      }))
+    }
+  } catch (error) {
+    console.error('获取封禁用户列表失败:', error)
+  }
+}
+
+// 封禁用户
+const banUser = async () => {
+  if (!banForm.value.userId || !banForm.value.duration) {
+    ElMessage.warning('请填写完整的封禁信息')
+    return
+  }
+
+  try {
+    const liftTime = Date.now() + banForm.value.duration
+    const response = await request.post(getFullUrl(API_PATHS.BAN_USER), null, {
+      params: {
+        banUserId: banForm.value.userId,
+        liftTime: liftTime
+      }
+    })
+
+    if (response.data && response.data.code === 200) {
+      ElMessage.success('封禁用户成功')
+      const bannedUsersData = JSON.parse(response.data.data)
+      bannedUsers.value = bannedUsersData.map(user => ({
+        id: user.user_id,
+        email: user.email,
+        username: user.username,
+        liftTime: user.lift_time
+      }))
+    } else {
+      ElMessage.error(response.data?.message || '封禁用户失败')
+    }
+  } catch (error) {
+    console.error('封禁用户失败:', error)
+    ElMessage.error('封禁用户失败')
+  }
+}
+
+// 在组件挂载时获取权限
+onMounted(() => {
+  fetchUserPermission()
+})
+
+// 监听管理面板的显示状态
+watch(adminPanelVisible, (newVal) => {
+  if (newVal) {
+    fetchRabbitMqStatus()
+    fetchWebsocketCount()
+    fetchBannedUsers()
+  }
+})
+
+// 在 script setup 部分添加
+const permissionForm = ref({
+  userId: '',
+  permission: 0
+})
+
+// 更新用户权限
+const updateUserPermission = async () => {
+  if (!permissionForm.value.userId) {
+    ElMessage.warning('请输入用户ID')
+    return
+  }
+
+  try {
+    const response = await request.post(getFullUrl(API_PATHS.UPDATE_USER_PERMISSION), null, {
+      params: {
+        updateUserId: permissionForm.value.userId,
+        permission: permissionForm.value.permission
+      }
+    })
+
+    if (response.data && response.data.code === 200) {
+      ElMessage.success('更新用户权限成功')
+      permissionForm.value.userId = ''
+      permissionForm.value.permission = 0
+    } else {
+      ElMessage.error(response.data?.message || '更新用户权限失败')
+    }
+  } catch (error) {
+    console.error('更新用户权限失败:', error)
+    ElMessage.error('更新用户权限失败')
+  }
+}
 </script>
 
 <style scoped>
@@ -1823,5 +2172,56 @@ const submitEditPaper = async () => {
   .add-block-btn {
     margin-top: 20px;
   }
+}
+
+/* 管理面板样式 */
+.admin-panel {
+  padding: 20px;
+}
+
+.status-section {
+  margin-bottom: 20px;
+}
+
+.status-section h4 {
+  margin-bottom: 10px;
+  color: var(--el-text-color-primary);
+}
+
+.user-management {
+  margin-bottom: 20px;
+}
+
+.banned-user-item {
+  margin-bottom: 15px;
+  padding: 10px;
+  border: 1px solid var(--el-border-color-light);
+  border-radius: 4px;
+}
+
+.banned-user-actions {
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
+}
+
+.ban-user-section {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--el-border-color-light);
+}
+
+.notice-management {
+  padding: 10px;
+}
+
+.admin-btn {
+  margin-right: 10px;
+}
+
+.permission-section {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--el-border-color-light);
 }
 </style>

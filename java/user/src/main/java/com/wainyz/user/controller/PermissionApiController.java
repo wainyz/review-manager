@@ -13,7 +13,6 @@ import com.wainyz.user.service.PermissionRegistryService;
 import com.wainyz.user.service.UserPermissionService;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.Timestamp;
@@ -24,7 +23,7 @@ import java.util.List;
  * 专门处理权限操作
  * @author Yanion_gwgzh
  */
-@Controller
+@RestController
 @RequestMapping("/permission")
 public class PermissionApiController {
 
@@ -110,9 +109,9 @@ public class PermissionApiController {
     }
 
     @PostMapping("/updateBanUser")
-    public ReturnModel updateBanUser(@RequestAttribute(GatewayConsistent.USER_ID) Long userId, @RequestParam Long banUserId, @RequestParam Long liftTime) throws JsonProcessingException {
+    public ReturnModel updateBanUser(@RequestAttribute(GatewayConsistent.USER_ID) String userId, @RequestParam String banUserId, @RequestParam Long liftTime) throws JsonProcessingException {
         //权限校验
-        Integer userPermission = userPermissionService.getUserPermission(userId);
+        Integer userPermission = userPermissionService.getUserPermission(Long.valueOf(userId));
         Integer servicePermission = permissionRegistryService.getServicePermission(PermissionType.Update.name());
         if((userPermission&(1 << servicePermission)) == 0){
             return ReturnModel.fail().setMessage("没有权限。");
