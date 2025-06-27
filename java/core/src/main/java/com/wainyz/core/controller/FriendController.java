@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -73,7 +74,7 @@ public class FriendController {
                                         @RequestAttribute(GatewayConsistent.USER_ID) Long userId,
       @RequestAttribute(GatewayConsistent.USER_NAME) String username    ){
         Long smallId = userId < friendId? userId: friendId;
-        Long bigId = userId != smallId? userId: friendId;
+        Long bigId = !userId.equals(smallId) ? userId: friendId;
         // 发送通知(校验步骤包含在这里面，所以将保存到数据库的操作放在后面)
         if (noticeService.agreeFriendApplyNotice(userId,username,friendId)) {
             Friends friends = new Friends();
@@ -104,7 +105,7 @@ public class FriendController {
         List<Friends> list = friendsService.lambdaQuery().eq(Friends::getSmallid, userId).or().eq(Friends::getBigid, userId).list();
         // 查找到对应的用户信息，然后返回给用户
         List<Long> collect = list.stream().map(friends -> {
-            if (friends.getBigid() == userId) {
+            if (Objects.equals(friends.getBigid(), userId)) {
                 return friends.getSmallid();
             } else {
                 return friends.getBigid();
