@@ -1,16 +1,10 @@
 package com.wainyz.gateway.config;
 
-import com.wainyz.commons.utils.JwtUtils;
 import com.wainyz.gateway.filters.JWTGlobalFilter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.filter.DelegatingFilterProxy;
-
-import java.util.*;
-
 import static com.wainyz.commons.config.UrlConfiguration.PUBLIC_PREFIX;
 
 /**
@@ -18,18 +12,19 @@ import static com.wainyz.commons.config.UrlConfiguration.PUBLIC_PREFIX;
  */
 @Configuration
 public class JwtFilterConfig {
-    //----------------0------------------
-    public final String PUBLIC_URL = PUBLIC_PREFIX ;
+    // ----------------0------------------
+    public final String PUBLIC_URL = PUBLIC_PREFIX;
     public final String Filter_URL = "/*";
     @Autowired
     private JWTGlobalFilter jwtGlobalFilter;
-    public JwtFilterConfig (
-    ) {
+
+    public JwtFilterConfig() {
     }
-    //================0==================
+    // ================0==================
 
     /**
      * 注册jwt过滤器
+     * 
      * @return
      */
     @Bean

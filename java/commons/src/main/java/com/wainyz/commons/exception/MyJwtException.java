@@ -2,7 +2,6 @@ package com.wainyz.commons.exception;
 
 
 import lombok.Getter;
-import org.springframework.web.bind.annotation.GetMapping;
 
 /**
  * @author Yanion_gwgzh

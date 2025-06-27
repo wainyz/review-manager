@@ -1,6 +1,4 @@
 package com.wainyz.gateway.config;
-
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -53,17 +51,6 @@ public class CosWebMvcConfigurer implements WebMvcConfigurer {
                         "X-Frame-Options")
                 .allowCredentials(true)
                 .maxAge(3600);
-//        registry.addMapping(mappingUrl)
-//                // 允许的源（域名），可以是多个
-//                .allowedOrigins(allowedOrigins.split(","))
-//                // 允许的 HTTP 方法
-//                .allowedMethods(allowedMethods.split(","))
-//                // 允许的请求头
-//                .allowedHeaders(allowedHeaders.split(","))
-//                // 是否允许发送 Cookie
-//                .allowCredentials(true)
-//                // 预检请求的缓存时间（秒）
-//                .maxAge(3600);
     }
 
 }
