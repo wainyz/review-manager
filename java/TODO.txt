@@ -1,0 +1,8 @@
+TODO:换成使用spring ai来调用大模型
+2025-6-17
+
+python在linux并不好部署，所以换成使用spring ai来调用大模型。另外暂时不改变rabbitmq。
+
+这个变更是后端内部。要做到的测试就是，发送一个deepseekrequest，那么一定要收到一个request，发送一个response一定要收到一个response
+另外还要测试spring ai是否能正常的得到大模型的返回。这需要判断大模型返回的是是否为空。
+
