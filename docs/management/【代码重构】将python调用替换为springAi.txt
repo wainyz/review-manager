@@ -1,4 +1,3 @@
-TODO:换成使用spring ai来调用大模型
 2025-6-17
 
 python在linux并不好部署，所以换成使用spring ai来调用大模型。另外暂时不改变rabbitmq。

@@ -3,5 +3,5 @@ spring:
   datasource:
     url: jdbc:mysql://***REMOVED***:3306/spring_cloud
     driver-class-name: com.mysql.cj.jdbc.Driver
-    username: service
-    password: ***REMOVED***
+    username: xxx
+    password: xxx

@@ -1,8 +1,0 @@
-<questionbank>
-  <question id="MATH001">
-    <type>fill_blank</type>
-    <text>勾股定理公式是：__^a²+b²=c²</text>
-    <difficulty>0.7</difficulty>
-    <category>几何</category>
-  </question>
-</questionbank>

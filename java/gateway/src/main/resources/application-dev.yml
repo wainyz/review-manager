@@ -8,10 +8,10 @@ jwt:
 spring:
   # 邮件配置
   mail:
-    host: smtp.163.com
+    host: xxx
     port: 465
-    username: ***REMOVED***
-    password: ***REMOVED***  # 网易邮箱的授权码，非登录密码
+    username: xxx
+    password: xxx  # 网易邮箱的授权码，非登录密码
     protocol: smtps
     properties:
       mail:
@@ -25,13 +25,13 @@ spring:
       port: 6379
       host: ***REMOVED***
       database: 0
-      password: ***REMOVED***
-      username: ***REMOVED***
+      password: xxx
+      username: xxx
   datasource:
     url: jdbc:mysql://***REMOVED***:3306/spring_cloud
     driver-class-name: com.mysql.cj.jdbc.Driver
-    username: service
-    password: ***REMOVED***
+    username: xxx
+    password: xxx
   rabbitmq:
     host: localhost
     port: 5672
@@ -50,7 +50,7 @@ file:
   deepseek-response: ./user/deepseek/response/
 # deepseek的 api key
 deepseek:
-  api-key: ***REMOVED***/
+  api-key: xxx
 
 cors:
   allowedOrigins: http://localhost:5173,http://localhost:80

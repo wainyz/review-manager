@@ -35,7 +35,7 @@ RESPONSE_SCORING_QUEUE = "deepseek_scoring_response"
 
 # DeepSeek API配置
 base_url = "https://api.deepseek.com"
-api_key = "***REMOVED***"
+api_key = "xxx"
 
 
 class RabbitMQProducer:
